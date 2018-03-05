@@ -570,7 +570,7 @@ defineTest(qtConfOutput_prepareOptions) {
 
         platform = $$eval(config.input.android-ndk-platform)
         isEmpty(platform): \
-            platform = android-16  ### the windows configure disagrees ...
+            platform = android-21  ### the windows configure disagrees ...
 
         $${currentConfig}.output.devicePro += \
             "DEFAULT_ANDROID_SDK_ROOT = $$val_escape(sdk_root)" \

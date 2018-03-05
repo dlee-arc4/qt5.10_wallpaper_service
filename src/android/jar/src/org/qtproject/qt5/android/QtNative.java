@@ -46,6 +46,7 @@ import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.app.Service;
+import android.service.wallpaper.WallpaperService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -79,6 +80,7 @@ public class QtNative
     private static boolean m_activityPaused = false;
     private static Service m_service = null;
     private static QtActivityDelegate m_activityDelegate = null;
+    private static QtWallpaperServiceDelegate m_wallpaperServiceDelegate = null;
     private static QtServiceDelegate m_serviceDelegate = null;
     public static Object m_mainActivityMutex = new Object(); // mutex used to synchronize runnable operations
 
@@ -135,6 +137,13 @@ public class QtNative
     {
         synchronized (m_mainActivityMutex) {
             return m_activityDelegate;
+        }
+    }
+
+    public static QtWallpaperServiceDelegate wallpaperServiceDelegate()
+    {
+        synchronized (m_mainActivityMutex) {
+            return m_wallpaperServiceDelegate;
         }
     }
 
@@ -220,6 +229,14 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             m_activity = qtMainActivity;
             m_activityDelegate = qtActivityDelegate;
+        }
+    }
+    
+    public static void setWallpaperService(WallpaperService qtMainWallpaper, QtWallpaperServiceDelegate qtWallpaperServiceDelegate)
+    {
+        synchronized (m_mainActivityMutex) {
+            m_service = qtMainWallpaper;
+            m_wallpaperServiceDelegate = qtWallpaperServiceDelegate;
         }
     }
 
@@ -392,7 +409,7 @@ public class QtNative
                 quitQtAndroidPlugin();
                 if (m_activity != null)
                      m_activity.finish();
-                 if (m_service != null)
+                if (m_service != null)
                      m_service.stopSelf();
             }
         });
@@ -747,6 +764,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
             }
         });
     }
@@ -769,6 +788,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.setSurfaceGeometry(id, x, y, w, h);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.setSurfaceGeometry(id, x, y, w, h);
             }
         });
     }
@@ -780,6 +801,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.bringChildToFront(id);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.bringChildToFront(id);
             }
         });
     }
@@ -791,6 +814,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.bringChildToBack(id);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.bringChildToBack(id);
             }
         });
     }
@@ -802,6 +827,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.destroySurface(id);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.destroySurface(id);
             }
         });
     }
