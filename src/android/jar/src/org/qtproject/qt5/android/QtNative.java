@@ -347,6 +347,7 @@ public class QtNative
                               m_displayMetricsDensity);
             if (params.length() > 0 && !params.startsWith("\t"))
                 params = "\t" + params;
+            Log.d("Qt", String.format("Starting Application %s, %s",f.getAbsolutePath() + params, environment));
             startQtApplication(f.getAbsolutePath() + params, environment);
             m_started = true;
         }

@@ -47,6 +47,7 @@
 #include <qpa/qwindowsysteminterface.h>
 #include <qpa/qplatformscreen.h>
 
+#include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 
@@ -60,6 +61,7 @@ QAndroidPlatformVulkanWindow::QAndroidPlatformVulkanWindow(QWindow *window)
       m_createVkSurface(nullptr),
       m_destroyVkSurface(nullptr)
 {
+    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformIntegration::createPlatformWindow L:%1").arg(__LINE__).toStdString().c_str()); 
 }
 
 QAndroidPlatformVulkanWindow::~QAndroidPlatformVulkanWindow()

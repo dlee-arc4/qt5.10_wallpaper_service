@@ -41,8 +41,8 @@ import android.content.pm.PackageManager;
 
 public class QtWallpaperServiceLoader extends QtLoader {
     QtWallpaperService m_service;
-    QtWallpaperServiceLoader(QtService service) {
-        super(service, QtService.class);
+    QtWallpaperServiceLoader(QtWallpaperService service) {
+        super(service,QtServiceLoader.class);
         m_service = service;
     }
 

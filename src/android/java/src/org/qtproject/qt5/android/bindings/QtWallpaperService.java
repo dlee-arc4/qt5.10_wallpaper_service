@@ -35,9 +35,8 @@
 */
 
 package org.qtproject.qt5.android.bindings;
+//
 import org.qtproject.qt5.android.QtWallpaperServiceDelegate;
-
-import android.app.Service;
 import android.view.SurfaceHolder; 
 import android.service.wallpaper.WallpaperService;
 import android.content.Intent;
@@ -45,59 +44,81 @@ import android.content.pm.ServiceInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.ComponentName;
+import android.app.PendingIntent;
+import android.app.Notification;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Process;
+//
+import android.app.Service;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.IBinder;
-
+import android.util.Log;
 public class QtWallpaperService extends WallpaperService
 {
-    public String APPLICATION_PARAMETERS = null; // use this variable to pass any parameters to your application,
-                                                               // the parameters must not contain any white spaces
-                                                               // and must be separated with "\t"
-                                                               // e.g "-param1\t-param2=value2\t-param3\tvalue3"
-
-    public String ENVIRONMENT_VARIABLES = "QT_USE_ANDROID_NATIVE_DIALOGS=1";
-                                                               // use this variable to add any environment variables to your application.
-                                                               // the env vars must be separated with "\t"
-                                                               // e.g. "ENV_VAR1=1\tENV_VAR2=2\t"
-                                                               // Currently the following vars are used by the android plugin:
-                                                               // * QT_USE_ANDROID_NATIVE_DIALOGS - 1 to use the android native dialogs.
-
-    public String[] QT_ANDROID_THEMES = null;     // A list with all themes that your application want to use.
-                                                  // The name of the theme must be the same with any theme from
-                                                  // http://developer.android.com/reference/android/R.style.html
-                                                  // The most used themes are:
-                                                  //  * "Theme" - (fallback) check http://developer.android.com/reference/android/R.style.html#Theme
-                                                  //  * "Theme_Black" - check http://developer.android.com/reference/android/R.style.html#Theme_Black
-                                                  //  * "Theme_Light" - (default for API <=10) check http://developer.android.com/reference/android/R.style.html#Theme_Light
-                                                  //  * "Theme_Holo" - check http://developer.android.com/reference/android/R.style.html#Theme_Holo
-                                                  //  * "Theme_Holo_Light" - (default for API 11-13) check http://developer.android.com/reference/android/R.style.html#Theme_Holo_Light
-                                                  //  * "Theme_DeviceDefault" - check http://developer.android.com/reference/android/R.style.html#Theme_DeviceDefault
-                                                  //  * "Theme_DeviceDefault_Light" - (default for API 14+) check http://developer.android.com/reference/android/R.style.html#Theme_DeviceDefault_Light
-
-    public String QT_ANDROID_DEFAULT_THEME = null; // sets the default theme.
-
+    private static final int ONGOING_NOTIFICATION_ID = 10112;
     QtWallpaperServiceLoader m_loader = new QtWallpaperServiceLoader(this);
-    
-    private QtWallpaperEngine m_engine;
-    private ServiceInfo m_serviceInfo;
+    private QtWallpaperEngine        m_engine = null;
     private QtWallpaperServiceDelegate m_qtDelegate;
-
-    public QtWallpaperService()
-    {
-      super();
-    }
     /////////////////////////// forward all notifications ////////////////////////////
     /////////////////////////// Super class calls ////////////////////////////////////
     /////////////// PLEASE DO NOT CHANGE THE FOLLOWING CODE //////////////////////////
     //////////////////////////////////////////////////////////////////////////////////
     protected void onCreateHook() {
+        Log.d("Qt", "QtWallpaperService:onCreateHook");
+
         m_loader.onCreate();
+        Intent notificationIntent = new Intent(getBaseContext(), QtWallpaperServiceLoader.class);
+        int drawableID = getBaseContext().getResources().getIdentifier("arc4", "drawable", getPackageName());
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);   
+        Notification notification = new Notification.Builder(this).setContentTitle("Qt Wallpaper Service")
+                                                                  .setTicker("Qt Wallpaper Started")
+                                                                  .setSmallIcon(R.drawable.arc4)
+                                                                  .setContentIntent(pendingIntent)
+                                                                  .setOngoing(true)
+                                                                  .build() ;
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
+
+        QtApplication.invokeDelegate(notificationIntent);
     }
+    @Override
+    public void onCreate()
+    {
+        Log.d("Qt", "QtWallpaperService:onCreate");
+        super.onCreate();
+        onCreateHook();
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public void onDestroy()
+    {
+        Log.d("Qt", "QtWallpaperService:onDestroy");
+        super.onDestroy();
+        QtApplication.invokeDelegate();
+        Process.killProcess(Process.myPid());
+    }
+    //onBind is final in wallpaperService. Which is upsetting because we 
+    //       might be loosing functionality by not calling QtApplication.invokeDelegate
+    //---------------------------------------------------------------------------
+
+    //public IBinder onBind(Intent intent)
+    //{
+    //    QtApplication.InvokeResult res = QtApplication.invokeDelegate(intent);
+    //    if (res.invoked)
+    //        return (IBinder)res.methodReturns;
+    //    else
+    //        return null;
+    //}
     //---------------------------------------------------------------------------
 
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
+        Log.d("Qt", "QtWallpaperService:onConfigurationChanged");
         if (!QtApplication.invokeDelegate(newConfig).invoked)
             super.onConfigurationChanged(newConfig);
     }
@@ -110,6 +131,7 @@ public class QtWallpaperService extends WallpaperService
     @Override
     public void onLowMemory()
     {
+        Log.d("Qt", "QtWallpaperService:onLowMemory");
         if (!QtApplication.invokeDelegate().invoked)
             super.onLowMemory();
     }
@@ -118,6 +140,7 @@ public class QtWallpaperService extends WallpaperService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        Log.d("Qt", "QtWallpaperService:onStartCommand");
         QtApplication.InvokeResult res = QtApplication.invokeDelegate(intent, flags, startId);
         if (res.invoked)
             return (Integer) res.methodReturns;
@@ -126,6 +149,7 @@ public class QtWallpaperService extends WallpaperService
     }
     public int super_onStartCommand(Intent intent, int flags, int startId)
     {
+        Log.d("Qt", "QtWallpaperService:super_onStartCommand");
         return super.onStartCommand(intent, flags, startId);
     }
     //---------------------------------------------------------------------------
@@ -133,11 +157,13 @@ public class QtWallpaperService extends WallpaperService
     @Override
     public void onTaskRemoved(Intent rootIntent)
     {
+        Log.d("Qt", "QtWallpaperService:onTaskRemoved");
         if (!QtApplication.invokeDelegate(rootIntent).invoked)
             super.onTaskRemoved(rootIntent);
     }
     public void super_onTaskRemoved(Intent rootIntent)
     {
+        Log.d("Qt", "QtWallpaperService:super_onTaskRemoved");
         super.onTaskRemoved(rootIntent);
     }
     //---------------------------------------------------------------------------
@@ -145,11 +171,13 @@ public class QtWallpaperService extends WallpaperService
     @Override
     public void onTrimMemory(int level)
     {
+        Log.d("Qt", "QtWallpaperService:onTrimMemory");
         if (!QtApplication.invokeDelegate(level).invoked)
             super.onTrimMemory(level);
     }
     public void super_onTrimMemory(int level)
     {
+        Log.d("Qt", "QtWallpaperService:super_onTrimMemory");
         super.onTrimMemory(level);
     }
     //---------------------------------------------------------------------------
@@ -157,6 +185,7 @@ public class QtWallpaperService extends WallpaperService
     @Override
     public boolean onUnbind(Intent intent)
     {
+        Log.d("Qt", "QtWallpaperService:onUnbind");
         QtApplication.InvokeResult res = QtApplication.invokeDelegate(intent);
         if (res.invoked)
             return (Boolean) res.methodReturns;
@@ -165,30 +194,19 @@ public class QtWallpaperService extends WallpaperService
     }
     public boolean super_onUnbind(Intent intent)
     {
+        Log.d("Qt", "QtWallpaperService:super_onUnbind");
         return super.onUnbind(intent);
     }
     //---------------------------------------------------------------------------
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-        onCreateHook();
-    }
-    //---------------------------------------------------------------------------
-
-    @Override
-    public void onDestroy()
-    {   
-        super.onDestroy();
-        m_qtDelegate.onDestroy();
-    }   
-    //---------------------------------------------------------------------------
+    //------------------------Engine---------------------------------------------
 
     @Override
     public WallpaperService.Engine onCreateEngine()
     {   
+        Log.d("Qt", "QtWallpaperService:onCreateEngine");
         if (null == m_engine) {
+            if ( null == m_qtDelegate)
+                m_qtDelegate = new QtWallpaperServiceDelegate();
             m_engine = new QtWallpaperEngine(m_qtDelegate);
         }
         return m_engine;
@@ -197,6 +215,7 @@ public class QtWallpaperService extends WallpaperService
 
     public QtWallpaperServiceDelegate getWallpaperDelegate()
     {   
+        Log.d("Qt", "QtWallpaperService:getWallpaperDelegate");
         return m_qtDelegate;
     }
     //---------------------------------------------------------------------------
@@ -212,47 +231,59 @@ public class QtWallpaperService extends WallpaperService
 
         public QtWallpaperEngine(QtWallpaperServiceDelegate qtDelegate) {
             super();
+            Log.d("Qt", "QtWallpaperEngine.Engine:Engine");
             m_qtDelegate = qtDelegate;
         }
         //---------------------------------------------------------------------------
         @Override
         public void onCreate(SurfaceHolder surfaceholder)
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onCreate");
             super.onCreate(surfaceholder);
         }
         //---------------------------------------------------------------------------
         @Override
         public void onDestroy()
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onDestroy");
             super.onDestroy();
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onSurfaceChanged");
             super.onSurfaceChanged(holder, format, width, height);
-            m_qtDelegate.onSurfaceChanged(holder, format, width, height);
+            if ( null != m_qtDelegate )
+                m_qtDelegate.onSurfaceChanged(holder, format, width, height);
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceCreated(SurfaceHolder holder)
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onSurfaceCreated");
             super.onSurfaceCreated(holder);
-            m_qtDelegate.onSurfaceCreated(holder);
+            if ( null != m_qtDelegate ){
+                m_qtDelegate.onSurfaceCreated(holder);
+            }
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder)
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onSurfaceDestroyed");
             super.onSurfaceDestroyed(holder);
-            m_qtDelegate.onSurfaceDestroyed(holder);
+            if ( null != m_qtDelegate )
+                m_qtDelegate.onSurfaceDestroyed(holder);
         }
         //---------------------------------------------------------------------------
         @Override
         public void onVisibilityChanged(boolean visible)
         {
+            Log.d("Qt", "QtWallpaperEngine.Engine:onVisibilityChanged");
             super.onVisibilityChanged(visible);
         }
         //---------------------------------------------------------------------------
     }
+
 }

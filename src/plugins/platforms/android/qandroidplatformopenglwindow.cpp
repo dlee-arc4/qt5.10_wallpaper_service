@@ -51,6 +51,7 @@
 #include <qpa/qwindowsysteminterface.h>
 #include <qpa/qplatformscreen.h>
 #include <QtEglSupport/private/qeglconvenience_p.h>
+#include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 
@@ -59,6 +60,7 @@ QT_BEGIN_NAMESPACE
 QAndroidPlatformOpenGLWindow::QAndroidPlatformOpenGLWindow(QWindow *window, EGLDisplay display)
     :QAndroidPlatformWindow(window), m_eglDisplay(display)
 {
+    __android_log_print(ANDROID_LOG_INFO, "Qt", "QAndroidPlatformOpenGLWindow::QAndroidPlatformOpenGLWindow"); 
 }
 
 QAndroidPlatformOpenGLWindow::~QAndroidPlatformOpenGLWindow()

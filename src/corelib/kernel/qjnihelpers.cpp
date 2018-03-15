@@ -47,6 +47,8 @@
 #include "qthread.h"
 #include <QtCore/qrunnable.h>
 
+#include <android/log.h>
+
 #include <deque>
 #include <memory>
 
