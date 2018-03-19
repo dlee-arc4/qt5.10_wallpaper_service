@@ -82,9 +82,11 @@ public class QtNative
     private static QtActivityDelegate m_activityDelegate = null;
     private static QtWallpaperServiceDelegate m_wallpaperServiceDelegate = null;
     private static QtServiceDelegate m_serviceDelegate = null;
-    public static Object m_mainActivityMutex = new Object(); // mutex used to synchronize runnable operations
+    private static boolean m_isDrawable = false;
 
-    public static final String QtTAG = "Qt JAVA"; // string used for Log.x
+    public  static Object m_mainActivityMutex = new Object(); // mutex used to synchronize runnable operations
+
+    public  static final String QtTAG = "Qt JAVA"; // string used for Log.x
     private static ArrayList<Runnable> m_lostActions = new ArrayList<Runnable>(); // a list containing all actions which could not be performed (e.g. the main activity is destroyed, etc.)
     private static boolean m_started = false;
     private static int m_displayMetricsScreenWidthPixels = 0;
@@ -151,6 +153,13 @@ public class QtNative
     {
         synchronized (m_mainActivityMutex) {
             return m_serviceDelegate;
+        }
+    }
+
+    public static boolean drawable()
+    {
+        synchronized (m_mainActivityMutex) {
+            return m_isDrawable;
         }
     }
 
@@ -229,6 +238,7 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             m_activity = qtMainActivity;
             m_activityDelegate = qtActivityDelegate;
+            m_isDrawable = true;
         }
     }
     
@@ -237,6 +247,7 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             m_service = qtMainWallpaper;
             m_wallpaperServiceDelegate = qtWallpaperServiceDelegate;
+            m_isDrawable = true;
         }
     }
 
@@ -245,6 +256,7 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             m_service = qtMainService;
             m_serviceDelegate = qtServiceDelegate;
+            m_isDrawable = false;
         }
     }
 
@@ -778,6 +790,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.insertNativeView(id, view, x, y, w, h);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.insertNativeView(id, view, x, y, w, h);
             }
         });
     }
@@ -851,6 +865,8 @@ public class QtNative
             public void run() {
                 if (m_activityDelegate != null)
                     m_activityDelegate.hideSplashScreen(duration);
+                else if (m_wallpaperServiceDelegate != null)
+                         m_wallpaperServiceDelegate.hideSplashScreen(duration);
             }
         });
     }

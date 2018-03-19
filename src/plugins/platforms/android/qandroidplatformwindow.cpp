@@ -156,6 +156,13 @@ void QAndroidPlatformWindow::updateStatusBarVisibility()
 
 bool QAndroidPlatformWindow::isExposed() const
 {
+    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformWindow::isExposed L:%1").arg(__LINE__).toStdString().c_str()); 
+    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("[%1] [%2] [%3]")
+        .arg(qApp->applicationState() > Qt::ApplicationHidden)
+        .arg(window()->isVisible())
+        .arg(!window()->geometry().isEmpty())
+        .toStdString().c_str()); 
+
     return qApp->applicationState() > Qt::ApplicationHidden
             && window()->isVisible()
             && !window()->geometry().isEmpty();

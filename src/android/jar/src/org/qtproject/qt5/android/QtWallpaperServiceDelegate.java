@@ -72,6 +72,10 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import android.view.SurfaceHolder;
 import android.service.wallpaper.WallpaperService;
@@ -106,7 +110,8 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     private SurfaceHolder m_surfaceHolder = null;
     private Semaphore m_surfaceIdSemaphore = new Semaphore(1);
     private Semaphore m_surfaceSemaphore = new Semaphore(0);
-
+    private ImageView m_splashScreen = null;
+    private boolean m_splashScreenSticky = false;
     private HashMap<Integer, QtSurface> m_surfaces = null;
     private HashMap<Integer, View> m_nativeViews = null;
     private QtLayout m_layout = null;
@@ -285,9 +290,30 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         m_layout.addView(surface, surfaceCount);
 
         m_surfaces.put(id, surface);
-        // if (!m_splashScreenSticky)
-            // hideSplashScreen();
+        if (!m_splashScreenSticky)
+            hideSplashScreen();
     } 
+
+    public void insertNativeView(int id, View view, int x, int y, int w, int h) {
+        if (m_dummyView != null) {
+            m_layout.removeView(m_dummyView);
+            m_dummyView = null;
+        }
+
+        if (m_nativeViews.containsKey(id))
+            m_layout.removeView(m_nativeViews.remove(id));
+
+        if (w < 0 || h < 0) {
+            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                 ViewGroup.LayoutParams.MATCH_PARENT));
+        } else {
+            view.setLayoutParams(new QtLayout.LayoutParams(w, h, x, y));
+        }
+
+        view.setId(id);
+        m_layout.addView(view);
+        m_nativeViews.put(id, view);
+    }
 
     // Called from QtNative
     public void setSurfaceGeometry(int id, int x, int y, int w, int h) {
@@ -298,8 +324,41 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
                 Log.e(QtNative.QtTAG, "Surface " + id +" not found! (have: " + m_idSurface + ")");
             }
         }
-    }   
+    }  
 
+    public void hideSplashScreen()
+    {
+        hideSplashScreen(0);
+    }
+
+    public void hideSplashScreen(final int duration)
+    {
+        if (m_splashScreen == null)
+            return;
+
+        if (duration <= 0) {
+            m_layout.removeView(m_splashScreen);
+            m_splashScreen = null;
+            return;
+        }
+
+        final Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator());
+        fadeOut.setDuration(duration);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) { hideSplashScreen(0); }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+
+            @Override
+            public void onAnimationStart(Animation animation) {}
+        });
+
+        m_splashScreen.startAnimation(fadeOut);
+    }
     public int getSurfaceCount()
     {
         return m_surfaces.size();

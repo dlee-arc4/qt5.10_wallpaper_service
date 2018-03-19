@@ -82,6 +82,8 @@ void QAndroidPlatformBackingStore::setBackingStore(QWindow *window)
         m_backingStoreSet = true;
     } else {
         qWarning("QAndroidPlatformBackingStore does not support OpenGL-only windows.");
+        (static_cast<QAndroidPlatformWindow *>(window->handle()))->setBackingStore(this);
+        m_backingStoreSet = true;
     }
 }
 

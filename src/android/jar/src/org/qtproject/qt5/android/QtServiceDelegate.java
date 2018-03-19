@@ -173,6 +173,7 @@ public class QtServiceDelegate
         // start application
         try {
             String nativeLibraryDir = QtNativeLibrariesDir.nativeLibrariesDir(m_service);
+            /* TODO: Test without Hard Coded Display Metrics*/
             QtNative.setApplicationDisplayMetrics(800, 480,
                                                   0, 0,
                                                   120.0, 120.0, 1.0, 1.0);

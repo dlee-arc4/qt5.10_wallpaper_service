@@ -110,6 +110,7 @@ static int m_surfaceId = 1;
 
 static QAndroidPlatformIntegration *m_androidPlatformIntegration = nullptr;
 
+static bool m_drawableContext;
 static int m_desktopWidthPixels  = 0;
 static int m_desktopHeightPixels = 0;
 static double m_scaledDensity = 0;
@@ -196,6 +197,11 @@ namespace QtAndroid
     jobject service()
     {
         return m_serviceObject;
+    }
+
+    bool drawable() 
+    {
+        return m_drawableContext;
     }
 
     void showStatusBar()
@@ -312,6 +318,7 @@ namespace QtAndroid
 
     int createSurface(AndroidSurfaceClient *client, const QRect &geometry, bool onTop, int imageDepth)
     {
+        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("createSurface: %2").arg(__LINE__).toStdString().c_str());
         QJNIEnvironmentPrivate env;
         if (!env)
             return -1;
@@ -546,8 +553,8 @@ static jboolean startQtApplication(JNIEnv *env, jobject /*object*/, jstring para
 
     // The service must wait until the QCoreApplication starts otherwise onBind will be
     // called too early
-    //if (m_serviceObject)
-    //    QtAndroidPrivate::waitForServiceSetup();
+    if (m_serviceObject && !m_drawableContext)
+       QtAndroidPrivate::waitForServiceSetup();
 
     return res;
 }
@@ -831,6 +838,8 @@ static int registerNatives(JNIEnv *env)
     jobject activityObject = env->CallStaticObjectMethod(m_applicationClass, methodID);
     GET_AND_CHECK_STATIC_METHOD(methodID, m_applicationClass, "service", "()Landroid/app/Service;");
     jobject serviceObject = env->CallStaticObjectMethod(m_applicationClass, methodID);
+    GET_AND_CHECK_STATIC_METHOD(methodID, m_applicationClass, "drawable", "()Z");
+    m_drawableContext = env->CallStaticBooleanMethod(m_applicationClass, methodID);
     GET_AND_CHECK_STATIC_METHOD(methodID, m_applicationClass, "classLoader", "()Ljava/lang/ClassLoader;");
     m_classLoaderObject = env->NewGlobalRef(env->CallStaticObjectMethod(m_applicationClass, methodID));
     clazz = env->GetObjectClass(m_classLoaderObject);

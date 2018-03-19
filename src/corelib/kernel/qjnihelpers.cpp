@@ -70,6 +70,7 @@ static JavaVM *g_javaVM = Q_NULLPTR;
 static jobject g_jActivity = Q_NULLPTR;
 static jobject g_jService = Q_NULLPTR;
 static jobject g_jClassLoader = Q_NULLPTR;
+static bool    g_jDrawableContext = false;
 static jint g_androidSdkVersion = 0;
 static jclass g_jNativeClass = Q_NULLPTR;
 static jmethodID g_runPendingCppRunnablesMethodID = Q_NULLPTR;
@@ -371,12 +372,28 @@ jint QtAndroidPrivate::initJNI(JavaVM *vm, JNIEnv *env)
     if (exceptionCheck(env))
         return JNI_ERR;
 
+
+    jmethodID drawableMethodID = env->GetStaticMethodID(jQtNative,
+                                                       "drawable",
+                                                       "()Z");
+
+    if (exceptionCheck(env))
+        return JNI_ERR;
+
+    g_jDrawableContext = env->CallStaticBooleanMethod(jQtNative, drawableMethodID);
+
+    if (exceptionCheck(env))
+        return JNI_ERR;
+
+
     jmethodID classLoaderMethodID = env->GetStaticMethodID(jQtNative,
                                                            "classLoader",
                                                            "()Ljava/lang/ClassLoader;");
 
     if (exceptionCheck(env))
         return JNI_ERR;
+
+
 
     jobject classLoader = env->CallStaticObjectMethod(jQtNative, classLoaderMethodID);
     if (exceptionCheck(env))
@@ -430,6 +447,11 @@ jobject QtAndroidPrivate::activity()
 jobject QtAndroidPrivate::service()
 {
     return g_jService;
+}
+
+bool QtAndroidPrivate::drawable()
+{
+    return g_jDrawableContext;
 }
 
 jobject QtAndroidPrivate::context()

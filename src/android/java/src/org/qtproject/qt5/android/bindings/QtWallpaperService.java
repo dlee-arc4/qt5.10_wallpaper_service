@@ -73,10 +73,10 @@ public class QtWallpaperService extends WallpaperService
         Intent notificationIntent = new Intent(getBaseContext(), QtWallpaperServiceLoader.class);
         int drawableID = getBaseContext().getResources().getIdentifier("arc4", "drawable", getPackageName());
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);   
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);   
         Notification notification = new Notification.Builder(this).setContentTitle("Qt Wallpaper Service")
                                                                   .setTicker("Qt Wallpaper Started")
-                                                                  .setSmallIcon(R.drawable.arc4)
+                                                                  .setSmallIcon(drawableID)
                                                                   .setContentIntent(pendingIntent)
                                                                   .setOngoing(true)
                                                                   .build() ;

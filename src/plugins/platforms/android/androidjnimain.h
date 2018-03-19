@@ -86,6 +86,7 @@ namespace QtAndroid
     jclass applicationClass();
     jobject activity();
     jobject service();
+    bool    drawable();
 
     void showStatusBar();
     void hideStatusBar();

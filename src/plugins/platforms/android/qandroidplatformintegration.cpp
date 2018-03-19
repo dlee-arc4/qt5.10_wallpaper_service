@@ -268,11 +268,11 @@ bool QAndroidPlatformIntegration::hasCapability(Capability cap) const
     switch (cap) {
         case ApplicationState: return true;
         case ThreadedPixmaps: return true;
-        case NativeWidgets: return QtAndroid::activity();
-        case OpenGL: return QtAndroid::activity();
-        case ForeignWindows: return QtAndroid::activity();
-        case ThreadedOpenGL: return !needsBasicRenderloopWorkaround() && QtAndroid::activity();
-        case RasterGLSurface: return QtAndroid::activity();
+        case NativeWidgets: return  QtAndroid::drawable();
+        case OpenGL: return QtAndroid::drawable();
+        case ForeignWindows: return  QtAndroid::drawable();
+        case ThreadedOpenGL: return !needsBasicRenderloopWorkaround() &&  QtAndroid::drawable();
+        case RasterGLSurface: return  QtAndroid::drawable();
         case TopStackedNativeChildWindows: return false;
         default:
             return QPlatformIntegration::hasCapability(cap);
@@ -281,14 +281,14 @@ bool QAndroidPlatformIntegration::hasCapability(Capability cap) const
 
 QPlatformBackingStore *QAndroidPlatformIntegration::createPlatformBackingStore(QWindow *window) const
 {
-    if (!QtAndroid::activity())
+    if (! QtAndroid::drawable())
         return nullptr;
     return new QAndroidPlatformBackingStore(window);
 }
 
 QPlatformOpenGLContext *QAndroidPlatformIntegration::createPlatformOpenGLContext(QOpenGLContext *context) const
 {
-    if (!QtAndroid::activity())
+    if (!QtAndroid::drawable())
         return nullptr;
     QSurfaceFormat format(context->format());
     format.setAlphaBufferSize(8);
@@ -302,7 +302,7 @@ QPlatformOpenGLContext *QAndroidPlatformIntegration::createPlatformOpenGLContext
 
 QPlatformOffscreenSurface *QAndroidPlatformIntegration::createPlatformOffscreenSurface(QOffscreenSurface *surface) const
 {
-    if (!QtAndroid::activity())
+    if (!QtAndroid::drawable())
         return nullptr;
 
     QSurfaceFormat format(surface->requestedFormat());
@@ -324,7 +324,7 @@ QPlatformOffscreenSurface *QAndroidPlatformIntegration::createPlatformOffscreenS
 QPlatformWindow *QAndroidPlatformIntegration::createPlatformWindow(QWindow *window) const
 {
     __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformIntegration::createPlatformWindow QWindow %1").arg(nullptr == window).toStdString().c_str()); 
-    if (!QtAndroid::activity() && !QtAndroid::service())
+    if (!QtAndroid::drawable())
         return nullptr;
 
 #if QT_CONFIG(vulkan)
