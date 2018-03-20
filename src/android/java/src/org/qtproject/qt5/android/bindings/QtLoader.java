@@ -191,7 +191,6 @@ public abstract class QtLoader {
     // this function is used to load and start the loader
     private void loadApplication(Bundle loaderParams)
     {
-        Log.d("QT", "QtLoader:loadApplication");
         try {
             final int errorCode = loaderParams.getInt(ERROR_CODE_KEY);
             if (errorCode != 0) {
@@ -249,7 +248,6 @@ public abstract class QtLoader {
                 System.loadLibrary(libName);
 
             Method startAppMethod=qtLoader.getClass().getMethod("startApplication");
-            Log.d("QT", "QtLoader:loadApplication:qtLoader.getClass().getMethod(\"startApplication\")");
             if (!(Boolean)startAppMethod.invoke(qtLoader))
                 throw new Exception("");
 
@@ -417,7 +415,6 @@ public abstract class QtLoader {
     private void extractBundledPluginsAndImports(String pluginsPrefix, String libsDir)
             throws IOException
     {
-        Log.d("QT", "QtLoader extractBundledPluginsAndImports");
         long packageVersion = -1;
         try {
             PackageInfo packageInfo = m_context.getPackageManager().getPackageInfo(m_context.getPackageName(), 0);
