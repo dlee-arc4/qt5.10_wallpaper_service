@@ -65,6 +65,7 @@ QAndroidPlatformOpenGLWindow::QAndroidPlatformOpenGLWindow(QWindow *window, EGLD
 
 QAndroidPlatformOpenGLWindow::~QAndroidPlatformOpenGLWindow()
 {
+    qInfo("QAndroidPlatformOpenGLWindow::~QAndroidPlatformOpenGLWindow:%d",__LINE__);
     m_surfaceWaitCondition.wakeOne();
     lockSurface();
     if (m_nativeSurfaceId != -1)
@@ -123,6 +124,7 @@ void QAndroidPlatformOpenGLWindow::setGeometry(const QRect &rect)
 
 EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
 {
+    qInfo("QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
     if (QAndroidEventDispatcherStopper::stopped())
         return m_eglSurface;
 
@@ -135,6 +137,7 @@ EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
 
         const bool windowStaysOnTop = bool(window()->flags() & Qt::WindowStaysOnTopHint);
         m_nativeSurfaceId = QtAndroid::createSurface(this, geometry(), windowStaysOnTop, 32);
+        qInfo("QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         m_surfaceWaitCondition.wait(&m_surfaceMutex);
     }
 
@@ -177,6 +180,8 @@ void QAndroidPlatformOpenGLWindow::applicationStateChanged(Qt::ApplicationState 
 
 void QAndroidPlatformOpenGLWindow::createEgl(EGLConfig config)
 {
+    qInfo("QAndroidPlatformOpenGLWindow::createEgl:%d",__LINE__);
+
     clearEgl();
     QJNIEnvironmentPrivate env;
     m_nativeWindow = ANativeWindow_fromSurface(env, m_androidSurfaceObject.object());
@@ -200,6 +205,7 @@ QSurfaceFormat QAndroidPlatformOpenGLWindow::format() const
 
 void QAndroidPlatformOpenGLWindow::clearEgl()
 {
+    qInfo("QAndroidPlatformOpenGLWindow::clearEgl:%d",__LINE__);
     if (m_eglSurface != EGL_NO_SURFACE) {
         eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         eglDestroySurface(m_eglDisplay, m_eglSurface);
@@ -214,6 +220,7 @@ void QAndroidPlatformOpenGLWindow::clearEgl()
 
 void QAndroidPlatformOpenGLWindow::surfaceChanged(JNIEnv *jniEnv, jobject surface, int w, int h)
 {
+    qInfo("QAndroidPlatformOpenGLWindow::surfaceChanged:%d",__LINE__);
     Q_UNUSED(jniEnv);
     Q_UNUSED(w);
     Q_UNUSED(h);

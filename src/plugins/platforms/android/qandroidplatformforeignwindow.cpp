@@ -90,9 +90,10 @@ void QAndroidPlatformForeignWindow::setGeometry(const QRect &rect)
 
 void QAndroidPlatformForeignWindow::setVisible(bool visible)
 {
+    qInfo("QAndroidPlatformForeignWindow::setVisible:%d", __LINE__);
     if (!m_view.isValid())
         return;
-
+    qInfo("QAndroidPlatformForeignWindow::setVisible:%d", __LINE__);
     QtAndroid::setViewVisibility(m_view.object(), visible);
 
     QAndroidPlatformWindow::setVisible(visible);

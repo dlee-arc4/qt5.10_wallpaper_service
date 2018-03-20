@@ -45,6 +45,7 @@
 #include <QOpenGLContext>
 #include <QThread>
 #include <QOffscreenSurface>
+#include <QtGlobal>
 
 #include <QtEglSupport/private/qeglpbuffer_p.h>
 #include <qpa/qwindowsysteminterface.h>
@@ -161,7 +162,6 @@ QAndroidPlatformIntegration::QAndroidPlatformIntegration(const QStringList &para
 #endif
 {
     
-     __android_log_print(ANDROID_LOG_INFO, "Qt", "QAndroidPlatformIntegration::QAndroidPlatformIntegration"); 
     Q_UNUSED(paramList);
     m_androidPlatformNativeInterface = new QAndroidPlatformNativeInterface();
 
@@ -290,6 +290,7 @@ QPlatformOpenGLContext *QAndroidPlatformIntegration::createPlatformOpenGLContext
 {
     if (!QtAndroid::drawable())
         return nullptr;
+    qInfo() << "QAndroidPlatformIntegration::createPlatformOpenGLContext";
     QSurfaceFormat format(context->format());
     format.setAlphaBufferSize(8);
     format.setRedBufferSize(8);
@@ -304,7 +305,7 @@ QPlatformOffscreenSurface *QAndroidPlatformIntegration::createPlatformOffscreenS
 {
     if (!QtAndroid::drawable())
         return nullptr;
-
+    qInfo() << "QAndroidPlatformIntegration::createPlatformOffscreenSurface";
     QSurfaceFormat format(surface->requestedFormat());
     format.setAlphaBufferSize(8);
     format.setRedBufferSize(8);
@@ -323,26 +324,24 @@ QPlatformOffscreenSurface *QAndroidPlatformIntegration::createPlatformOffscreenS
 
 QPlatformWindow *QAndroidPlatformIntegration::createPlatformWindow(QWindow *window) const
 {
-    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformIntegration::createPlatformWindow QWindow %1").arg(nullptr == window).toStdString().c_str()); 
     if (!QtAndroid::drawable())
         return nullptr;
-
+    qInfo() << "QAndroidPlatformIntegration::createPlatformWindow";
 #if QT_CONFIG(vulkan)
     if (window->surfaceType() == QSurface::VulkanSurface)
         return new QAndroidPlatformVulkanWindow(window);
 #endif
-    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformIntegration::createPlatformWindow L:%1").arg(__LINE__).toStdString().c_str()); 
     return new QAndroidPlatformOpenGLWindow(window, m_eglDisplay);
 }
 
 QPlatformWindow *QAndroidPlatformIntegration::createForeignWindow(QWindow *window, WId nativeHandle) const
 {
-    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformIntegration::createForeignWindow QWindow %1, WId %2").arg(nullptr == window).arg(nativeHandle).toStdString().c_str()); 
     return new QAndroidPlatformForeignWindow(window, nativeHandle);
 }
 
 QAbstractEventDispatcher *QAndroidPlatformIntegration::createEventDispatcher() const
 {
+    qInfo() << "QAndroidPlatformIntegration::createEventDispatcher";
     return new QAndroidEventDispatcher;
 }
 

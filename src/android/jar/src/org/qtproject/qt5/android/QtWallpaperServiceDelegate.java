@@ -93,6 +93,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+
 public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 {
     private static final String NATIVE_LIBRARIES_KEY = "native.libraries";
@@ -105,6 +106,12 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     private static final String APP_DISPLAY_METRIC_SCREEN_XDPI_KEY = "display.screen.dpi.x";
     private static final String APP_DISPLAY_METRIC_SCREEN_YDPI_KEY = "display.screen.dpi.y";
     private static final String APP_DISPLAY_METRIC_SCREEN_DENSITY_KEY = "display.screen.density";
+
+    // application state
+    public static final int ApplicationSuspended = 0x0;
+    public static final int ApplicationHidden = 0x1;
+    public static final int ApplicationInactive = 0x2;
+    public static final int ApplicationActive = 0x4;
 
     private int m_idSurface = -1; 
     private SurfaceHolder m_surfaceHolder = null;
@@ -121,11 +128,34 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     private String m_mainLib;
     private static String m_environmentVariables = null;
     private static String m_applicationParameters = null;
+    private boolean m_started = false;
+    
+    public void onCreate()
+    {
+        QtNative.setApplicationState(ApplicationActive);
+    }
+
+    public void onPause()
+    {
+        QtNative.setApplicationState(ApplicationInactive);
+    }
+
+    public void onResume()
+    {
+        QtNative.setApplicationState(ApplicationActive);
+        if (m_started) {
+            QtNative.updateWindow();
+        }
+    }
+
+    public void onStop()
+    {
+        QtNative.setApplicationState(ApplicationSuspended);
+    }
 
     public boolean loadApplication(Service service, ClassLoader classLoader, Bundle loaderParams)
     {
         /// check parameters integrity
-        Log.d("QT", "QtWallpaperServiceDelegate loadApplication");
         if (!loaderParams.containsKey(NATIVE_LIBRARIES_KEY)
                 || !loaderParams.containsKey(BUNDLED_LIBRARIES_KEY)) {
             return false;
@@ -145,7 +175,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
                   Class<?> initClass = classLoader.loadClass(className);
                   Object staticInitDataObject = initClass.newInstance(); // create an instance
                   try {
-                      Method m = initClass.getMethod("setiWallpaperService", Service.class, Object.class);
+                      Method m = initClass.getMethod("setWallpaperService", Service.class, Object.class);
                       m.invoke(staticInitDataObject, m_service, this);
                   } catch (Exception e) {
                   }
@@ -193,13 +223,11 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         // start application
         try {
             String nativeLibraryDir = QtNativeLibrariesDir.nativeLibrariesDir(m_service);
-            QtNative.setApplicationDisplayMetrics(800, 480,
-                                                  0, 0,
-                                                  120.0, 120.0, 1.0, 1.0);
             QtNative.startApplication(m_applicationParameters,
                     m_environmentVariables,
                     m_mainLib,
                     nativeLibraryDir);
+            m_started = true;
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,18 +251,16 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceCreated(SurfaceHolder holder)
     {
-        Log.d("Qt", "QtWallpaperServiceDelegate:onSurfaceCreated");
         m_surfaceHolder = holder;
         try {
-            Log.d("Qt", "QtWallpaperServiceDelegate:onSurfaceCreated:m_surfaceIdSemaphore.acquire()");
             m_surfaceIdSemaphore.acquire(); // 3: Have surface and id of the surface Qt is expecting
         } catch (InterruptedException e) {
             e.printStackTrace();
             return;
         }
-        Log.d("Qt", "QtWallpaperServiceDelegate:QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), 800, 480);");
         QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), 800, 480);
         m_surfaceSemaphore.release(); // 4: Surface is set up and ready to go
+        QtNative.setApplicationState(ApplicationActive);
     }
 
     // Called from QtWallpaperService.QtWallpaperEngine

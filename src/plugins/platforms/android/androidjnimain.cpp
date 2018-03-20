@@ -318,7 +318,7 @@ namespace QtAndroid
 
     int createSurface(AndroidSurfaceClient *client, const QRect &geometry, bool onTop, int imageDepth)
     {
-        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("createSurface: %2").arg(__LINE__).toStdString().c_str());
+        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("%1 createSurface: %2").arg(__FILE__).arg(__LINE__).toStdString().c_str());
         QJNIEnvironmentPrivate env;
         if (!env)
             return -1;
@@ -525,19 +525,16 @@ static jboolean startQtApplication(JNIEnv *env, jobject /*object*/, jstring para
         // This library should already be loaded, and calling dlopen() will just return a reference to it.
         m_mainLibraryHnd = dlopen(m_applicationParams.constFirst().data(), 0);
         if (Q_UNLIKELY(!m_mainLibraryHnd)) {
-            __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("startMainMethod@ %1:dlopen failed: %2").arg(__LINE__).arg(dlerror()).toStdString().c_str());
             qCritical() << "dlopen failed:" << dlerror();
             return false;
         }
         m_main = (Main)dlsym(m_mainLibraryHnd, "main");
     } else {
         qWarning("No main library was specified; searching entire process (this is slow!)");
-        __android_log_print(ANDROID_LOG_INFO, m_qtTag, "No main library was specified; searching entire process (this is slow!)");
         m_main = (Main)dlsym(RTLD_DEFAULT, "main");
     }
 
     if (Q_UNLIKELY(!m_main)) {
-        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("startMainMethod@ %1:dlopen failed: %2").arg(__LINE__).arg(dlerror()).toStdString().c_str());
         qCritical() << "dlsym failed:" << dlerror() << endl
                     << "Could not find main method";
         return false;
@@ -608,7 +605,6 @@ static void terminateQt(JNIEnv *env, jclass /*clazz*/)
 
 static void setSurface(JNIEnv *env, jobject /*thiz*/, jint id, jobject jSurface, jint w, jint h)
 {
-    __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("%1:setSurface@ %2").arg(__FILE__).arg(__LINE__).toStdString().c_str());
     QMutexLocker lock(&m_surfacesMutex);
     const auto &it = m_surfaces.find(id);
     if (it == m_surfaces.end())
@@ -616,8 +612,10 @@ static void setSurface(JNIEnv *env, jobject /*thiz*/, jint id, jobject jSurface,
 
     auto surfaceClient = it.value();
     if (surfaceClient)
-        surfaceClient->surfaceChanged(env, jSurface, w, h);
-    __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("%1:setSurface@ %2").arg(__FILE__).arg(__LINE__).toStdString().c_str());
+    {
+        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("%1:setSurface@ %2").arg(__FILE__).arg(__LINE__).toStdString().c_str());
+         surfaceClient->surfaceChanged(env, jSurface, w, h);
+    }   
 }
 
 static void setDisplayMetrics(JNIEnv */*env*/, jclass /*clazz*/,
@@ -679,6 +677,7 @@ static void updateWindow(JNIEnv */*env*/, jobject /*thiz*/)
 
 static void updateApplicationState(JNIEnv */*env*/, jobject /*thiz*/, jint state)
 {
+    __android_log_print(ANDROID_LOG_DEBUG, m_qtTag, "androidjnimain:%s(state=%i)","updateApplicationState",state); 
     QMutexLocker lock(&m_platformMutex);
     if (!m_main || !m_androidPlatformIntegration) {
         m_pendingApplicationState = state;
@@ -901,7 +900,6 @@ Q_DECL_EXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void */*reserved*/)
     m_javaVM = nullptr;
 
     if (vm->GetEnv(&uenv.venv, JNI_VERSION_1_4) != JNI_OK) {
-        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("JNI_OnLoad@ %1").arg(__LINE__).toStdString().c_str());
         return -1;
     }
 
@@ -911,7 +909,6 @@ Q_DECL_EXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void */*reserved*/)
             || !QtAndroidMenu::registerNatives(env)
             || !QtAndroidAccessibility::registerNatives(env)
             || !QtAndroidDialogHelpers::registerNatives(env)) {
-        __android_log_print(ANDROID_LOG_FATAL, m_qtTag, "registerNatives failed");
         return -1;
     }
     QWindowSystemInterfacePrivate::TabletEvent::setPlatformSynthesizesMouse(false);

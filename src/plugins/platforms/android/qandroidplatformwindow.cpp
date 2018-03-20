@@ -77,28 +77,46 @@ void QAndroidPlatformWindow::setGeometry(const QRect &rect)
 
 void QAndroidPlatformWindow::setVisible(bool visible)
 {
+    __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
     if (visible)
+    {
+        __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
         updateStatusBarVisibility();
-
-    if (visible) {
-        if (m_windowState & Qt::WindowFullScreen)
-            setGeometry(platformScreen()->geometry());
-        else if (m_windowState & Qt::WindowMaximized)
-            setGeometry(platformScreen()->availableGeometry());
     }
 
-    if (visible)
+    if (visible) {
+        __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
+        if (m_windowState & Qt::WindowFullScreen)
+        {
+            __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
+            setGeometry(platformScreen()->geometry());
+        }
+        else if (m_windowState & Qt::WindowMaximized)
+        {
+            __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
+            setGeometry(platformScreen()->availableGeometry());
+        }
+    }
+    __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
+    if (visible){
+        __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
         platformScreen()->addWindow(this);
-    else
+    } else{
+        __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);    
         platformScreen()->removeWindow(this);
-
+    }
+    __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
     QRect availableGeometry = screen()->availableGeometry();
     if (geometry().width() > 0 && geometry().height() > 0 && availableGeometry.width() > 0 && availableGeometry.height() > 0)
+    {
+        __android_log_print(ANDROID_LOG_INFO, "Qt", "%s:%d","QAndroidPlatformWindow::setVisible",__LINE__);
         QPlatformWindow::setVisible(visible);
+    }
 }
 
 void QAndroidPlatformWindow::setWindowState(Qt::WindowStates state)
 {
+    qInfo("QAndroidPlatformWindow::setWindowState(Qt::WindowStates %d)", state);
     if (m_windowState == state)
         return;
 
@@ -156,20 +174,14 @@ void QAndroidPlatformWindow::updateStatusBarVisibility()
 
 bool QAndroidPlatformWindow::isExposed() const
 {
-    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("QAndroidPlatformWindow::isExposed L:%1").arg(__LINE__).toStdString().c_str()); 
-    __android_log_print(ANDROID_LOG_INFO, "Qt", QString("[%1] [%2] [%3]")
-        .arg(qApp->applicationState() > Qt::ApplicationHidden)
-        .arg(window()->isVisible())
-        .arg(!window()->geometry().isEmpty())
-        .toStdString().c_str()); 
-
     return qApp->applicationState() > Qt::ApplicationHidden
             && window()->isVisible()
             && !window()->geometry().isEmpty();
 }
 
-void QAndroidPlatformWindow::applicationStateChanged(Qt::ApplicationState)
+void QAndroidPlatformWindow::applicationStateChanged(Qt::ApplicationState state)
 {
+    qApp->applicationStateChanged(state);
     QRegion region;
     if (isExposed())
         region = QRect(QPoint(), geometry().size());
