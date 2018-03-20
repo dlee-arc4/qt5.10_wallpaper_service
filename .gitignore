@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------
 
 # Specific files/paths
-
+qtbase.sublime-workspace
 # qmake/configure stuff
 /.qmake.cache
 /.qmake.stash
