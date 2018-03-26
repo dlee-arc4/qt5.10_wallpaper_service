@@ -50,6 +50,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
+import android.os.Looper;
 //
 import android.app.Service;
 import android.content.Intent;
@@ -216,12 +217,17 @@ public class QtWallpaperService extends WallpaperService
         public QtWallpaperEngine(QtWallpaperServiceDelegate qtDelegate) {
             super();
             m_qtDelegate = qtDelegate;
+
+            Looper.getMainLooper().loop();
+            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::QtWallpaperEngine loop started");
         }
         //---------------------------------------------------------------------------
         @Override
         public void onCreate(SurfaceHolder surfaceholder)
         {
             super.onCreate(surfaceholder);
+            Looper.getMainLooper().loop();
+            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::onCreate loop started");
         }
         //---------------------------------------------------------------------------
         @Override
@@ -236,6 +242,8 @@ public class QtWallpaperService extends WallpaperService
             super.onSurfaceChanged(holder, format, width, height);
             if ( null != m_qtDelegate )
                 m_qtDelegate.onSurfaceChanged(holder, format, width, height);
+            Looper.getMainLooper().loop();
+            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::onSurfaceChanged loop started");
         }
         //---------------------------------------------------------------------------
         @Override
@@ -245,6 +253,8 @@ public class QtWallpaperService extends WallpaperService
             if ( null != m_qtDelegate ){
                 m_qtDelegate.onSurfaceCreated(holder);
             }
+            Looper.getMainLooper().loop();
+            Log.e("LOOPER", "WATERMARK QtWallpaperServiceDelegate::onSurfaceCreated loop started");
         }
         //---------------------------------------------------------------------------
         @Override

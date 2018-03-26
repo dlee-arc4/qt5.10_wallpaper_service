@@ -291,12 +291,17 @@ public class QtNative
             Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("%s", actionIsQueued));
             
             if (!actionIsQueued)
+            {
+                Log.e(QtTAG, "WATERMARK QtNative.Java -- queueing pending event");    
                 m_lostActions.add(action);
+            }
         }
     }
 
     private static void runPendingCppRunnablesOnAndroidThread()
     {
+         Log.e(QtTAG, "WATERMARK QtNative:runPendingCppRunnablesOnAndroidThread");
+            
         synchronized (m_mainActivityMutex) {
             if (m_activity != null) {
                 if (!m_activityPaused)
@@ -304,6 +309,7 @@ public class QtNative
                 else
                     runAction(runPendingCppRunnablesRunnable);
             } else {
+                Log.e(QtTAG, "WATERMARK QtNative:m_activity == null runing manually");
                 final Looper mainLooper = Looper.getMainLooper();
                 final Thread looperThread = mainLooper.getThread();
                 if (looperThread.equals(Thread.currentThread())) {

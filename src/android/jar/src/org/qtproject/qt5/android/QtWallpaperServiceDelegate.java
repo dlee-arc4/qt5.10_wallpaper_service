@@ -53,6 +53,7 @@ import android.net.LocalSocket;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.text.method.MetaKeyKeyListener;
@@ -287,6 +288,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
         Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface");
+
         if (m_surfaces.size() == 0) {
             TypedValue attr = new TypedValue();
             m_service.getTheme().resolveAttribute(android.R.attr.windowBackground, attr, true);

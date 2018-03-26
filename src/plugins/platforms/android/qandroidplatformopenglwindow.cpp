@@ -137,7 +137,7 @@ EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
         const bool windowStaysOnTop = bool(window()->flags() & Qt::WindowStaysOnTopHint);
         qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         m_nativeSurfaceId = QtAndroid::createSurface(this, geometry(), windowStaysOnTop, 32);
-        // m_surfaceWaitCondition.wait(&m_surfaceMutex);
+        m_surfaceWaitCondition.wait(&m_surfaceMutex);
     }
 
     if (m_eglSurface == EGL_NO_SURFACE) {
