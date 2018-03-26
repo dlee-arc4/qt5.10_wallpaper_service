@@ -281,10 +281,15 @@ public class QtNative
 
     private static void runAction(Runnable action)
     {
+        Log.e(QtTAG, "WATERMARK QtNative.Java -- runAction" );
         synchronized (m_mainActivityMutex) {
             final Looper mainLooper = Looper.getMainLooper();
             final Handler handler = new Handler(mainLooper);
-            final boolean actionIsQueued = !m_activityPaused && m_activity != null && mainLooper != null && handler.post(action);
+            boolean handler_posted =  handler.post(action);
+            final boolean actionIsQueued = !m_activityPaused && m_isDrawable && mainLooper != null && handler_posted;
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("final boolean actionIsQueued = !%s && %s != null && %s != null && %s",m_activityPaused,m_isDrawable,mainLooper,handler_posted));
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("%s", actionIsQueued));
+            
             if (!actionIsQueued)
                 m_lostActions.add(action);
         }
@@ -771,13 +776,23 @@ public class QtNative
 
     private static void createSurface(final int id, final boolean onTop, final int x, final int y, final int w, final int h, final int imageDepth)
     {
+        Log.e(QtTAG, "WATERMARK QtNative.Java -- createSurface");
         runAction(new Runnable() {
             @Override
             public void run() {
                 if (m_activityDelegate != null)
+                {
+                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);");
                     m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+                }
                 else if (m_wallpaperServiceDelegate != null)
-                         m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+                {
+                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);");
+                    m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+                }
+                else {
+                    Log.e(QtTAG, "WATERMARK QtNative.Java -- No Delegate");       
+                }
             }
         });
     }

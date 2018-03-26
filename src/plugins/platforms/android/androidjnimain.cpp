@@ -318,7 +318,7 @@ namespace QtAndroid
 
     int createSurface(AndroidSurfaceClient *client, const QRect &geometry, bool onTop, int imageDepth)
     {
-        __android_log_print(ANDROID_LOG_INFO, m_qtTag, QString("%1 createSurface: %2").arg(__FILE__).arg(__LINE__).toStdString().c_str());
+        qInfo("WATERMARK QtAndroid::createSurface:%d",__LINE__);
         QJNIEnvironmentPrivate env;
         if (!env)
             return -1;
@@ -605,6 +605,7 @@ static void terminateQt(JNIEnv *env, jclass /*clazz*/)
 
 static void setSurface(JNIEnv *env, jobject /*thiz*/, jint id, jobject jSurface, jint w, jint h)
 {
+    qInfo("WATERMARK QtAndroid::setSurface:%d",__LINE__);
     QMutexLocker lock(&m_surfacesMutex);
     const auto &it = m_surfaces.find(id);
     if (it == m_surfaces.end())

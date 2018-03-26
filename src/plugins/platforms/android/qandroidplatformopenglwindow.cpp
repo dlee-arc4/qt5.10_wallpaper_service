@@ -124,7 +124,6 @@ void QAndroidPlatformOpenGLWindow::setGeometry(const QRect &rect)
 
 EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
 {
-    qInfo("QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
     if (QAndroidEventDispatcherStopper::stopped())
         return m_eglSurface;
 
@@ -136,9 +135,9 @@ EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
             return m_eglSurface;
 
         const bool windowStaysOnTop = bool(window()->flags() & Qt::WindowStaysOnTopHint);
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         m_nativeSurfaceId = QtAndroid::createSurface(this, geometry(), windowStaysOnTop, 32);
-        qInfo("QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
-        m_surfaceWaitCondition.wait(&m_surfaceMutex);
+        // m_surfaceWaitCondition.wait(&m_surfaceMutex);
     }
 
     if (m_eglSurface == EGL_NO_SURFACE) {
@@ -220,7 +219,7 @@ void QAndroidPlatformOpenGLWindow::clearEgl()
 
 void QAndroidPlatformOpenGLWindow::surfaceChanged(JNIEnv *jniEnv, jobject surface, int w, int h)
 {
-    qInfo("QAndroidPlatformOpenGLWindow::surfaceChanged:%d",__LINE__);
+    qInfo("WATERMARK QAndroidPlatformOpenGLWindow::surfaceChanged:%d",__LINE__);
     Q_UNUSED(jniEnv);
     Q_UNUSED(w);
     Q_UNUSED(h);

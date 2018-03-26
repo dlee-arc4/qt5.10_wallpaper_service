@@ -266,6 +266,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::onSurfaceChanged");
         if (width < 1 || height < 1)
             return;
 
@@ -285,6 +286,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     }   
 
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface");
         if (m_surfaces.size() == 0) {
             TypedValue attr = new TypedValue();
             m_service.getTheme().resolveAttribute(android.R.attr.windowBackground, attr, true);
@@ -318,6 +320,8 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         m_surfaces.put(id, surface);
         if (!m_splashScreenSticky)
             hideSplashScreen();
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface->QtNative.setSurface(id, surface, w, h);");
+        QtNative.setSurface(id, surface, w, h);
     } 
 
     public void insertNativeView(int id, View view, int x, int y, int w, int h) {
