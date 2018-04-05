@@ -285,9 +285,9 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             final Looper mainLooper = Looper.getMainLooper();
             final Handler handler = new Handler(mainLooper);
-            boolean handler_posted =  handler.post(action);
-            final boolean actionIsQueued = !m_activityPaused && m_isDrawable && mainLooper != null && handler_posted;
-            Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("final boolean actionIsQueued = !%s && %s != null && %s != null && %s",m_activityPaused,m_isDrawable,mainLooper,handler_posted));
+            // boolean handler_posted =  handler.post(action);
+            final boolean actionIsQueued = !m_activityPaused && m_activity != null && mainLooper != null && handler.post(action);
+            // Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("final boolean actionIsQueued = !%s && %s != null && %s != null && %s",m_activityPaused,m_isDrawable,mainLooper,handler_posted));
             Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("%s", actionIsQueued));
             
             if (!actionIsQueued)

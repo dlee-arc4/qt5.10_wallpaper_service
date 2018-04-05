@@ -93,13 +93,18 @@
 	],
 	"file_history":
 	[
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtLayout.java",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qjnihelpers.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtWallpaperService.java",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtActivityLoader.java",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtServiceLoader.java",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtLoader.java",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/androidjnimain.cpp",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformopenglwindow.cpp",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformwindow.cpp",
+		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtLayout.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtWallpaperServiceLoader.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtNative.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtSurface.java",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformopenglwindow.cpp",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/androidjnimain.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformintegration.h",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/androidsurfaceclient.h",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/gui/kernel/qguiapplication.cpp",
@@ -108,13 +113,10 @@
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformopenglwindow.h",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformintegration.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtWallpaperServiceDelegate.java",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformwindow.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformwindow.h",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformopenglcontext.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/jar/src/org/qtproject/qt5/android/QtActivityDelegate.java",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtActivityLoader.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/gui/kernel/qwindow.cpp",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtLoader.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtApplication.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformscreen.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/gui/kernel/qplatformwindow.cpp",
@@ -155,7 +157,6 @@
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qcoreapplication.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/androidjnimain.h",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/gui/kernel/qsurface.cpp",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qjnihelpers.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qjni.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qjnionload.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/corelib/kernel/qjnihelpers_p.h",
@@ -167,7 +168,6 @@
 		"/opt/sed-stash/arc4/code/Libraries/core/src/ThreadingSupport/Thread.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidplatformbackingstore.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/androidjnimenu.cpp",
-		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/android/java/src/org/qtproject/qt5/android/bindings/QtServiceLoader.java",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidsystemlocale.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/plugins/platforms/android/qandroidinputcontext.cpp",
 		"/opt/sed-stash/arc4/external/android24-gcc4.9-arm64/sources/07-qt-5.10/qtbase/src/gui/kernel/qplatformintegration.cpp",
@@ -222,13 +222,17 @@
 	],
 	"find":
 	{
-		"height": 27.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
 		"height": 110.0,
 		"where_history":
 		[
+			"src/android,src/plugins/platforms/android,src/corelib/kernel",
+			"src/android;src/plugins/platforms/android",
+			"src/android",
+			"src/android,src/plugins/platforms/android,src/corelib",
 			"src/android,src/plugins/platforms/android",
 			"src/android",
 			"src/plugins/platforms/android",
@@ -282,6 +286,28 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"m_drawa",
+			"load",
+			"LoadAp",
+			"prepareAppMethod",
+			"loadApplication",
+			"Can't create",
+			"VisibilityChanged",
+			"Visibility",
+			"doVisibilityChanged",
+			"loop()",
+			"Looper",
+			"runPendingCppRunnables",
+			"runPendingCpp",
+			"runPendingCppRunnables",
+			"Looper",
+			"runPendingCppRunnablesOnAndroidThread",
+			"Looper",
+			"LoperThread",
+			"Looper",
+			"eglsurface",
+			"wait",
+			"m_surfaceWaitCondition",
 			"onSurfaceCreated",
 			"m_nativeViews",
 			"createSurface",
@@ -387,29 +413,7 @@
 			"m_surfaceIdSemaphore",
 			"createSurface",
 			"context",
-			"setSurface",
-			"surfaceChanged",
-			"insertNativeView",
-			"insertnativeview",
-			"Surface",
-			"Egl",
-			"QtNative",
-			"EGL",
-			"onSurfaceCreate",
-			"m_surfaceHolder",
-			"HashMap",
-			"m_nativeViews",
-			"m_surfaces",
-			"Surface",
-			"surfaceChanged",
-			"java",
-			"surface",
-			"surfaceChanged",
-			"checkNativeSurface",
-			"createEgl",
-			"m_surfaceWaitCondition",
-			"m_nativeSurfaceId",
-			"EGL"
+			"setSurface"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -442,7 +446,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 27.0
+		"height": 21.0
 	},
 	"input":
 	{
@@ -479,7 +483,7 @@
 	"project": "qtbase.sublime-project",
 	"replace":
 	{
-		"height": 50.0
+		"height": 38.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -488,6 +492,46 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"jnimain",
+				"plugins/platforms/android/androidjnimain.cpp"
+			],
+			[
+				"qtactiv",
+				"android/java/src/org/qtproject/qt5/android/bindings/QtActivityLoader.java"
+			],
+			[
+				"qtserve",
+				"android/java/src/org/qtproject/qt5/android/bindings/QtServiceLoader.java"
+			],
+			[
+				"qtnative.",
+				"android/jar/src/org/qtproject/qt5/android/QtNative.java"
+			],
+			[
+				"androidjni",
+				"plugins/platforms/android/androidjnimain.cpp"
+			],
+			[
+				"qtwallpaperservicelo",
+				"android/java/src/org/qtproject/qt5/android/bindings/QtWallpaperServiceLoader.java"
+			],
+			[
+				"qtwallpaperser",
+				"android/java/src/org/qtproject/qt5/android/bindings/QtWallpaperService.java"
+			],
+			[
+				"qtandroidwallpa",
+				"android/jar/src/org/qtproject/qt5/android/QtWallpaperServiceDelegate.java"
+			],
+			[
+				"qandroidplatofrmopengl",
+				"plugins/platforms/android/qandroidplatformopenglwindow.cpp"
+			],
+			[
+				"androidplatformwindo",
+				"plugins/platforms/android/qandroidplatformwindow.cpp"
+			],
 			[
 				"wallpaper",
 				"android/jar/src/org/qtproject/qt5/android/QtWallpaperServiceDelegate.java"
@@ -545,10 +589,6 @@
 				"android/jar/src/org/qtproject/qt5/android/QtNative.java"
 			],
 			[
-				"jnimain",
-				"plugins/platforms/android/androidjnimain.cpp"
-			],
-			[
 				"qtlayout",
 				"android/jar/src/org/qtproject/qt5/android/QtLayout.java"
 			],
@@ -567,10 +607,6 @@
 			[
 				"qtlayout.java",
 				"android/jar/src/org/qtproject/qt5/android/QtLayout.java"
-			],
-			[
-				"qtwallpaperser",
-				"android/jar/src/org/qtproject/qt5/android/QtWallpaperServiceDelegate.java"
 			],
 			[
 				"qtactivityde",
@@ -599,10 +635,6 @@
 			[
 				"qtactivity",
 				"android/jar/src/org/qtproject/qt5/android/QtActivityDelegate.java"
-			],
-			[
-				"qtactiv",
-				"android/java/src/org/qtproject/qt5/android/bindings/QtActivity.java"
 			],
 			[
 				"activity",
@@ -912,8 +944,8 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": false,
-	"side_bar_width": 221.0,
+	"side_bar_visible": true,
+	"side_bar_width": 164.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -238,6 +238,10 @@ public abstract class QtLoader {
                     contextClassName(),
                     ClassLoader.class,
                     Bundle.class);
+            Log.e("DEBUG",String.format("%s:%s:%s:%s","loadApplication",
+                    contextClassName(),
+                    ClassLoader.class,
+                    Bundle.class));
             if (!(Boolean)prepareAppMethod.invoke(qtLoader, m_context, classLoader, loaderParams))
                 throw new Exception("");
 

@@ -57,12 +57,16 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
 import android.util.Log;
+
+import java.lang.Thread;
 public class QtWallpaperService extends WallpaperService
 {
     private static final int ONGOING_NOTIFICATION_ID = 10112;
+
     QtWallpaperServiceLoader m_loader = new QtWallpaperServiceLoader(this);
     private QtWallpaperEngine        m_engine = null;
     private QtWallpaperServiceDelegate m_qtDelegate;
+    private Thread m_loopThread;
     /////////////////////////// forward all notifications ////////////////////////////
     /////////////////////////// Super class calls ////////////////////////////////////
     /////////////// PLEASE DO NOT CHANGE THE FOLLOWING CODE //////////////////////////
@@ -216,50 +220,49 @@ public class QtWallpaperService extends WallpaperService
 
         public QtWallpaperEngine(QtWallpaperServiceDelegate qtDelegate) {
             super();
+            Log.e("QT", "QtWallpaperEngine::QtWallpaperEngine");
             m_qtDelegate = qtDelegate;
 
-            Looper.getMainLooper().loop();
-            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::QtWallpaperEngine loop started");
         }
         //---------------------------------------------------------------------------
         @Override
         public void onCreate(SurfaceHolder surfaceholder)
         {
+            Log.e("QT", "QtWallpaperEngine::OnCreate");
             super.onCreate(surfaceholder);
-            Looper.getMainLooper().loop();
-            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::onCreate loop started");
         }
         //---------------------------------------------------------------------------
         @Override
         public void onDestroy()
         {
+            Log.e("QT", "QtWallpaperEngine::onDestroy");
             super.onDestroy();
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
         {
+            Log.e("QT", "QtWallpaperEngine::onSurfaceCHanged");
             super.onSurfaceChanged(holder, format, width, height);
             if ( null != m_qtDelegate )
                 m_qtDelegate.onSurfaceChanged(holder, format, width, height);
-            Looper.getMainLooper().loop();
-            Log.e("LOOPER", "WATERMARK QtWallpaperEngine::onSurfaceChanged loop started");
+
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceCreated(SurfaceHolder holder)
         {
+            Log.e("QT", "QtWallpaperEngine::onSurfaceCreated");
             super.onSurfaceCreated(holder);
             if ( null != m_qtDelegate ){
                 m_qtDelegate.onSurfaceCreated(holder);
             }
-            Looper.getMainLooper().loop();
-            Log.e("LOOPER", "WATERMARK QtWallpaperServiceDelegate::onSurfaceCreated loop started");
         }
         //---------------------------------------------------------------------------
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder)
         {
+            Log.e("QT", "QtWallpaperEngine::onSurfaceDestroyed");
             super.onSurfaceDestroyed(holder);
             if ( null != m_qtDelegate )
                 m_qtDelegate.onSurfaceDestroyed(holder);
@@ -268,6 +271,7 @@ public class QtWallpaperService extends WallpaperService
         @Override
         public void onVisibilityChanged(boolean visible)
         {
+            Log.e("QT", "QtWallpaperEngine::onVIsibilityChanged");
             super.onVisibilityChanged(visible);
         }
         //---------------------------------------------------------------------------

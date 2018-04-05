@@ -90,6 +90,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -131,18 +132,22 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     private static String m_applicationParameters = null;
     private boolean m_started = false;
     
+    private Thread m_loopThread;
     public void onCreate()
     {
+        Log.e("QT", "QtWallpaperDelegate::onCreate");
         QtNative.setApplicationState(ApplicationActive);
     }
 
     public void onPause()
     {
+        Log.e("QT", "QtWallpaperDelegate::onPause");
         QtNative.setApplicationState(ApplicationInactive);
     }
 
     public void onResume()
     {
+        Log.e("QT", "QtWallpaperDelegate::onResume");
         QtNative.setApplicationState(ApplicationActive);
         if (m_started) {
             QtNative.updateWindow();
@@ -151,21 +156,24 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
     public void onStop()
     {
+        Log.e("QT", "QtWallpaperDelegate::onStop");
         QtNative.setApplicationState(ApplicationSuspended);
     }
 
     public boolean loadApplication(Service service, ClassLoader classLoader, Bundle loaderParams)
     {
+        Log.e("QT", "QtWallpaperDelegate::loadApplications");
         /// check parameters integrity
         if (!loaderParams.containsKey(NATIVE_LIBRARIES_KEY)
                 || !loaderParams.containsKey(BUNDLED_LIBRARIES_KEY)) {
+            Log.e("QT", "QtWallpaperDelegate::loadApplications returned false");
             return false;
         }
-
+        Log.e("QT", "QtWallpaperDelegate::loadApplications");
         m_service = (WallpaperService) service;
         QtNative.setWallpaperService((WallpaperService)m_service, this);
         QtNative.setClassLoader(classLoader);
-
+        Log.e("QT", "QtWallpaperDelegate::loadApplications");
         QtNative.setApplicationDisplayMetrics(10, 10, 10, 10, 120, 120, 1.0, 1.0);
 
         if (loaderParams.containsKey(STATIC_INIT_CLASSES_KEY)) {
@@ -216,6 +224,9 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         else
             m_applicationParameters = "";
 
+        Log.e("QT", "QtWallpaperDelegate::loadApplications: Starting Loop");
+
+        Log.e("QT", "QtWallpaperDelegate::loadApplications: Loop Started");
         return true;
     }
 
