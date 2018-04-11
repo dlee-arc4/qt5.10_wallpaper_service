@@ -65,7 +65,7 @@ public class QtWallpaperService extends WallpaperService
 
     QtWallpaperServiceLoader m_loader = new QtWallpaperServiceLoader(this);
     private QtWallpaperEngine        m_engine = null;
-    private QtWallpaperServiceDelegate m_qtDelegate;
+    private QtWallpaperServiceDelegate m_qtDelegate = null;
     private Thread m_loopThread;
     /////////////////////////// forward all notifications ////////////////////////////
     /////////////////////////// Super class calls ////////////////////////////////////
@@ -191,16 +191,31 @@ public class QtWallpaperService extends WallpaperService
     //---------------------------------------------------------------------------
     //------------------------Engine---------------------------------------------
 
+
     @Override
     public WallpaperService.Engine onCreateEngine()
     {   
         if (null == m_engine) {
+            if(null != QtApplication.m_delegateObject)
+            {
+                Log.e("QT", "DLee WallpaperService.Engine onCreateEngine constructing a QtApplication has a hot and fresh delegate for us, with classname: " + QtApplication.m_delegateObject.getClass());
+                if(QtApplication.m_delegateObject instanceof QtWallpaperServiceDelegate)
+                {
+                    Log.e("QT", "DLEE WallpaperService.Engine onCreateEngine WOOO the app delegate is an instanceof QtWallpaperServiceDelegate");
+                    m_qtDelegate = (QtWallpaperServiceDelegate)QtApplication.m_delegateObject;
+                }
+            }
+
             if ( null == m_qtDelegate)
+            {
+                Log.e("QT", "WallpaperService.Engine onCreateEngine constructing a QtWallpaperServiceDelegate");
                 m_qtDelegate = new QtWallpaperServiceDelegate();
+            }
             m_engine = new QtWallpaperEngine(m_qtDelegate);
         }
         return m_engine;
-    }   
+    }
+
     //---------------------------------------------------------------------------
 
     public QtWallpaperServiceDelegate getWallpaperDelegate()
@@ -209,6 +224,10 @@ public class QtWallpaperService extends WallpaperService
     }
     //---------------------------------------------------------------------------
 
+    public void setWallpaperDelegate(QtWallpaperServiceDelegate delegate)
+    {
+        m_qtDelegate = delegate;
+    }
 
    /*
     * This wallpaper engine is the only way to get access to an OpenGL
@@ -216,10 +235,20 @@ public class QtWallpaperService extends WallpaperService
     */
     public class QtWallpaperEngine extends Engine {
 
-        private QtWallpaperServiceDelegate m_qtDelegate;
+        private QtWallpaperServiceDelegate m_qtDelegate = null;
 
         public QtWallpaperEngine(QtWallpaperServiceDelegate qtDelegate) {
             super();
+
+            try
+            {
+                throw new Exception("QtWallpaperEngine CTOR");
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }        
+      
             Log.e("QT", "QtWallpaperEngine::QtWallpaperEngine");
             m_qtDelegate = qtDelegate;
 
