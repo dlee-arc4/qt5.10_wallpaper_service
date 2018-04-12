@@ -115,10 +115,12 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     public static final int ApplicationInactive = 0x2;
     public static final int ApplicationActive = 0x4;
 
-    private int m_idSurface = -1; 
+    //private int m_idSurface = -1; 
+    private int m_idSurface = 1; 
     private SurfaceHolder m_surfaceHolder = null;
     private Semaphore m_surfaceIdSemaphore = new Semaphore(1);
     private Semaphore m_surfaceSemaphore = new Semaphore(0);
+
     private ImageView m_splashScreen = null;
     private boolean m_splashScreenSticky = false;
     private HashMap<Integer, QtSurface> m_surfaces = null;
@@ -133,21 +135,60 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     private boolean m_started = false;
     
     private Thread m_loopThread;
+
+    private static int m_instanceCount = 0;
+
+    private String m_secretSauce = "";
+
+    private int m_instanceIndex = 0;
+
+
+    public QtWallpaperServiceDelegate()
+    {
+        super();
+        try{
+            throw new Exception("QtWallpaperServiceDelegate CTOR");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+        m_instanceCount++;
+        m_instanceIndex = m_instanceCount;
+        Log.e("QT", "DLEE QtWallpaperDelegate::ctor constructed : " + m_instanceIndex);
+    }
+
+    /*
+    private QtWallpaperServiceDelegate()
+    {
+        try{
+            throw new Exception("QtWallpaperServiceDelegate dont call my private constructor!");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }        
+    }
+    */
+
     public void onCreate()
     {
-        Log.e("QT", "QtWallpaperDelegate::onCreate");
+        Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::onCreate");
+
+
         QtNative.setApplicationState(ApplicationActive);
     }
 
     public void onPause()
     {
-        Log.e("QT", "QtWallpaperDelegate::onPause");
+        Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::onPause");
         QtNative.setApplicationState(ApplicationInactive);
     }
 
     public void onResume()
     {
-        Log.e("QT", "QtWallpaperDelegate::onResume");
+        Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::onResume");
         QtNative.setApplicationState(ApplicationActive);
         if (m_started) {
             QtNative.updateWindow();
@@ -162,7 +203,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
     public boolean loadApplication(Service service, ClassLoader classLoader, Bundle loaderParams)
     {
-        Log.e("QT", "QtWallpaperDelegate::loadApplications");
+        Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::loadApplication");
         /// check parameters integrity
         if (!loaderParams.containsKey(NATIVE_LIBRARIES_KEY)
                 || !loaderParams.containsKey(BUNDLED_LIBRARIES_KEY)) {
@@ -234,14 +275,27 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     {
         // start application
         try {
+            Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::StartApplication 1");
             String nativeLibraryDir = QtNativeLibrariesDir.nativeLibrariesDir(m_service);
             QtNative.startApplication(m_applicationParameters,
                     m_environmentVariables,
                     m_mainLib,
                     nativeLibraryDir);
+            Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::StartApplication 2");
             m_started = true;
+            //DLEE put this here, copied from ActivityDelegate... might not make sense in this instance
+            if (null == m_surfaces)
+            {
+                Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::StartApplication 3");
+                //onCreate();
+
+                m_surfaces =  new HashMap<Integer, QtSurface>();
+                m_nativeViews = new HashMap<Integer, View>();
+                Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::StartApplication 4");
+            }
             return true;
         } catch (Exception e) {
+            Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::StartApplication 5");
             e.printStackTrace();
             return false;
         }
@@ -270,6 +324,14 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
             e.printStackTrace();
             return;
         }
+
+        if(m_idSurface <= 0)
+        {
+            Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceCreated, m_idSurface: " + m_idSurface + " invalid, bailing out");
+            //return;
+        }
+
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceCreated, calling setSurface with m_idSurface: " + m_idSurface);
         QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), 800, 480);
         m_surfaceSemaphore.release(); // 4: Surface is set up and ready to go
         QtNative.setApplicationState(ApplicationActive);
@@ -278,11 +340,18 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::onSurfaceChanged");
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceChanged");
         if (width < 1 || height < 1)
             return;
 
+        if(m_idSurface <= 0)
+        {
+            Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceChanged, m_idSurface: " + m_idSurface + " invalid, bailing out");
+            //return;
+        }
+
         m_surfaceHolder = holder;
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceChanged, calling setSurface with m_idSurface: " + m_idSurface);
         if (m_idSurface >= 0) {
             QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), width, height);
         }
@@ -298,7 +367,17 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     }   
 
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface");
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface");
+
+
+        try
+        {
+            throw new Exception("QtWallpaperServiceDelegate::createSurface CALLSTACK");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         if (m_surfaces.size() == 0) {
             TypedValue attr = new TypedValue();
@@ -308,16 +387,23 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
             // } else {
             //     m_service.getWindow().setBackgroundDrawable(m_service.getResources().getDrawable(attr.resourceId));
             // }
+            /*
             if (m_dummyView != null) {
                 m_layout.removeView(m_dummyView);
                 m_dummyView = null;
-            }
+            }*/
         }
 
+        /*
         if (m_surfaces.containsKey(id))
             m_layout.removeView(m_surfaces.remove(id));
+        */
 
+        Log.e("Qt", "DLee QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface id: " + id + " onTop: " + onTop + " imageDepth: " + imageDepth);
+        m_idSurface = id;
+        /*
         QtSurface surface = new QtSurface(m_service, id, onTop, imageDepth);
+        
         if (w < 0 || h < 0) {
             surface.setLayoutParams( new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
@@ -328,16 +414,21 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         // Native views are always inserted in the end of the stack (i.e., on top).
         // All other views are stacked based on the order they are created.
         final int surfaceCount = getSurfaceCount();
-        m_layout.addView(surface, surfaceCount);
-
+        //m_layout.addView(surface, surfaceCount);
+        
         m_surfaces.put(id, surface);
         if (!m_splashScreenSticky)
             hideSplashScreen();
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface->QtNative.setSurface(id, surface, w, h);");
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface->QtNative.setSurface(id : " + id + ", surface, w: " + w + " , h: " + h + ");");
+        
         QtNative.setSurface(id, surface, w, h);
+        */
     } 
 
     public void insertNativeView(int id, View view, int x, int y, int w, int h) {
+        
+        Log.e("Qt", "DLEE we in insertNativeView WHOAH WOAH WOAH.... this is not my batman cup");
+
         if (m_dummyView != null) {
             m_layout.removeView(m_dummyView);
             m_dummyView = null;
@@ -362,7 +453,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     public void setSurfaceGeometry(int id, int x, int y, int w, int h) {
         if (null != m_surfaceHolder) {
             if (m_idSurface == id) {
-                m_surfaceHolder.setFixedSize(w, h); 
+                //m_surfaceHolder.setFixedSize(w, h); 
             } else {
                 Log.e(QtNative.QtTAG, "Surface " + id +" not found! (have: " + m_idSurface + ")");
             }
@@ -380,6 +471,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
             return;
 
         if (duration <= 0) {
+            Log.e("Qt", "DLEE we in hideSplashScreen, trying to m_layout.removeView(m_splashScreen);");
             m_layout.removeView(m_splashScreen);
             m_splashScreen = null;
             return;
@@ -411,9 +503,10 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtNative
     public void destroySurface(int id) 
     {   
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::destroySurface we in here");
         m_surfaceIdSemaphore.drainPermits();
         onSurfaceDestroyed(null);
-        m_idSurface = -1; 
+        m_idSurface = -2; 
     }   
 
     public void bringChildToFront(int id) 
@@ -423,4 +516,9 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     public void bringChildToBack(int id) 
     {   
     } 
+
+    public boolean hasSurface()
+    {
+        return m_idSurface != -1;
+    }
 }

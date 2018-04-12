@@ -48,6 +48,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import android.util.Log;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -59,6 +61,7 @@ public class QtSurface extends SurfaceView implements SurfaceHolder.Callback
     public QtSurface(Context context, int id, boolean onTop, int imageDepth)
     {
         super(context);
+        Log.e("QT", "DLEE QtSurface:QtSurface 1");
         setFocusable(false);
         setFocusableInTouchMode(false);
         setZOrderMediaOverlay(onTop);
@@ -68,6 +71,8 @@ public class QtSurface extends SurfaceView implements SurfaceHolder.Callback
         else
             getHolder().setFormat(PixelFormat.RGBA_8888);
 
+        Log.e("QT", "DLEE QtSurface:QtSurface 2, id: " + id);
+
         setId(id);
         m_gestureDetector =
             new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -76,6 +81,8 @@ public class QtSurface extends SurfaceView implements SurfaceHolder.Callback
                 }
             });
         m_gestureDetector.setIsLongpressEnabled(true);
+
+        Log.e("QT", "DLEE QtSurface:QtSurface 3");
     }
 
     @Override

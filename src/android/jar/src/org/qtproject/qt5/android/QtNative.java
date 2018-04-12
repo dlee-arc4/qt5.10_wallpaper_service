@@ -102,6 +102,9 @@ public class QtNative
     private static ClipboardManager m_clipboardManager = null;
     private static Method m_checkSelfPermissionMethod = null;
     private static Boolean m_tabletEventSupported = null;
+
+    private static Looper m_hackedLooper = null;
+
     private static final Runnable runPendingCppRunnablesRunnable = new Runnable() {
         @Override
         public void run() {
@@ -244,10 +247,18 @@ public class QtNative
     
     public static void setWallpaperService(WallpaperService qtMainWallpaper, QtWallpaperServiceDelegate qtWallpaperServiceDelegate)
     {
+
+        Log.e(QtTAG, "DLEE WE IN HERE: setWallpaperService");
+
         synchronized (m_mainActivityMutex) {
             m_service = qtMainWallpaper;
             m_wallpaperServiceDelegate = qtWallpaperServiceDelegate;
             m_isDrawable = true;
+
+            m_hackedLooper = Looper.myLooper();
+
+            Log.e(QtTAG, "DLEE we are in the synchronized block, m_hackedLooper is: " + (m_hackedLooper==null?"NULL":"NOT NULL") );
+
         }
     }
 
@@ -262,16 +273,28 @@ public class QtNative
 
     public static void setApplicationState(int state)
     {
+        Log.e(QtTAG, "DLEE we in here  QtNative.Java -- setApplicationState, state: " + state );
         synchronized (m_mainActivityMutex) {
             switch (state) {
                 case QtActivityDelegate.ApplicationActive:
+                    Log.e(QtTAG, "DLEE state is: QtActivityDelegate.ApplicationActive" );
                     m_activityPaused = false;
-                    Iterator<Runnable> itr = m_lostActions.iterator();
-                    while (itr.hasNext())
-                        runAction(itr.next());
+                    ArrayList<Runnable> lostActionsToAttempt = m_lostActions;
                     m_lostActions.clear();
+                    Iterator<Runnable> itr = lostActionsToAttempt.iterator();
+                    int numAction = 0;
+                    while (itr.hasNext())
+                    {
+                        numAction++;
+                        Log.e(QtTAG, "DLEE running lost action #" + numAction );
+                        final Runnable act = itr.next();
+                        runAction(act);
+                        Log.e(QtTAG, "DLEE done with lost action #" + numAction );
+                    }
+
                     break;
                 default:
+                    Log.e(QtTAG, "DLEE state is: DEFAULT :-(" );
                     m_activityPaused = true;
                     break;
             }
@@ -285,8 +308,32 @@ public class QtNative
         synchronized (m_mainActivityMutex) {
             final Looper mainLooper = Looper.getMainLooper();
             final Handler handler = new Handler(mainLooper);
-            // boolean handler_posted =  handler.post(action);
-            final boolean actionIsQueued = !m_activityPaused && m_activity != null && mainLooper != null && handler.post(action);
+            //final boolean handler_posted =  handler.post(action);
+            //final boolean actionIsQueued = !m_activityPaused && m_activity != null && mainLooper != null && handler.post(action);
+            
+            
+            final boolean mainLooperIsNull = mainLooper == null;
+            final boolean mactivityIsNull = m_activity == null;
+            final boolean mserviceIsNull = m_service == null;
+            boolean wallpaperServiceDelegateHasSurface = false;
+            Log.e(QtTAG, "DLEE m_activityPaused: " + m_activityPaused + " m_activity null: " + mactivityIsNull + " mainLooper null: " + mainLooperIsNull + " m_service null: " + (m_service == null) + " m_isDrawable: " + m_isDrawable);
+            
+
+            Log.e(QtTAG, "DLEE m_service null: " + (m_service == null) + " m_wallpaperServiceDelegate null: " + (m_wallpaperServiceDelegate == null));
+            if(m_wallpaperServiceDelegate != null)
+            {
+                wallpaperServiceDelegateHasSurface = m_wallpaperServiceDelegate.hasSurface();
+                Log.e(QtTAG, "DLEE m_wallpaperServiceDelegate.hasSurface: " + wallpaperServiceDelegateHasSurface);
+            }
+
+            boolean actionIsQueued = false;
+            final boolean attemptToQueueAction = !m_activityPaused && (m_activity != null || (m_service != null && m_isDrawable)) && mainLooper != null;
+            if(attemptToQueueAction)
+            {
+                Log.e(QtTAG, "DLEE QtNative.Java -- runAction attemptToQueueAction" );
+                actionIsQueued = handler.post(action);
+            } 
+
             // Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("final boolean actionIsQueued = !%s && %s != null && %s != null && %s",m_activityPaused,m_isDrawable,mainLooper,handler_posted));
             Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("%s", actionIsQueued));
             
@@ -604,7 +651,10 @@ public class QtNative
         runAction(new Runnable() {
             @Override
             public void run() {
-                m_activityDelegate.updateHandles(mode, x1, y1, x2, y2, rtl);
+                if (m_activityDelegate != null)
+                {
+                    m_activityDelegate.updateHandles(mode, x1, y1, x2, y2, rtl);
+                }
             }
         });
     }
@@ -783,17 +833,21 @@ public class QtNative
     private static void createSurface(final int id, final boolean onTop, final int x, final int y, final int w, final int h, final int imageDepth)
     {
         Log.e(QtTAG, "WATERMARK QtNative.Java -- createSurface");
+
+        
         runAction(new Runnable() {
             @Override
             public void run() {
                 if (m_activityDelegate != null)
                 {
-                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);");
+                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_activityDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                                                                                                      ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
                     m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
                 }
                 else if (m_wallpaperServiceDelegate != null)
                 {
-                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);");
+                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_wallpaperServiceDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                                                                                                      ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
                     m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
                 }
                 else {
@@ -801,6 +855,25 @@ public class QtNative
                 }
             }
         });
+        
+
+        /*
+        if (m_activityDelegate != null)
+        {
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- m_activityDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                                                                                              ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
+            m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+        }
+        else if (m_wallpaperServiceDelegate != null)
+        {
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- m_wallpaperServiceDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                                                                                              ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
+            m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
+        }
+        else {
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- No Delegate");       
+        }
+        */
     }
 
     private static void insertNativeView(final int id, final View view, final int x, final int y, final int w, final int h)
@@ -873,7 +946,10 @@ public class QtNative
         runAction(new Runnable() {
             @Override
             public void run() {
-                m_activityDelegate.initializeAccessibility();
+                if (m_activityDelegate != null)
+                    m_activityDelegate.initializeAccessibility();
+                //else if (m_wallpaperServiceDelegate != null)
+                         //m_wallpaperServiceDelegate.initializeAccessibility();
             }
         });
     }
