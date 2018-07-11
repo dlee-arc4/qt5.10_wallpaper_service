@@ -848,25 +848,34 @@ public class QtNative
             e.printStackTrace();
         }
 
+        //Consider adding a function to just pass the ID directly to wallpaperServiceDelegate and let createSurface run as expected, with the runnables
+        if (m_wallpaperServiceDelegate != null)
+        {
+            Log.e(QtTAG, "WATERMARK QtNative.Java::createSurface, calling DIRECTLY: m_wallpaperServiceDelegate.setSurfaceId(id: " + id +");");
+            m_wallpaperServiceDelegate.setSurfaceId(id);
+        }
+
         
         runAction(new Runnable() {
             @Override
             public void run() {
+                Log.e(QtTAG, "QtNative.Java::createSurface - runable ENTER");
                 if (m_activityDelegate != null)
                 {
-                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_activityDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                    Log.e(QtTAG, "QtNative.Java -- Runnable - m_activityDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
                                                                                                       ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
                     m_activityDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
                 }
                 else if (m_wallpaperServiceDelegate != null)
                 {
-                    Log.e(QtTAG, "WATERMARK QtNative.Java -- m_wallpaperServiceDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
+                    Log.e(QtTAG, "QtNative.Java -- Runnable - m_wallpaperServiceDelegate.createSurface(id: " + id + ", onTop: " + onTop + ", x:" + x + ", y: " + y +  
                                                                                                       ", w: " + w + ", h: " + h + ", imageDepth: " + imageDepth +");");
                     m_wallpaperServiceDelegate.createSurface(id, onTop, x, y, w, h, imageDepth);
                 }
                 else {
-                    Log.e(QtTAG, "WATERMARK QtNative.Java -- No Delegate");       
+                    Log.e(QtTAG, "QtNative.Java -- Runnable - No Delegate");       
                 }
+                Log.e(QtTAG, "QtNative.Java::createSurface - runable EXIT");
             }
         });
         

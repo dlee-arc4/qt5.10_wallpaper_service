@@ -116,9 +116,9 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     public static final int ApplicationActive = 0x4;
 
     //private int m_idSurface = -1; 
-    private int m_idSurface = 1; 
+    private int m_idSurface = -1; 
     private SurfaceHolder m_surfaceHolder = null;
-    private Semaphore m_surfaceIdSemaphore = new Semaphore(1);
+    private Semaphore m_surfaceIdSemaphore = new Semaphore(0);
     private Semaphore m_surfaceSemaphore = new Semaphore(0);
 
     private ImageView m_splashScreen = null;
@@ -327,20 +327,16 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceCreated(SurfaceHolder holder)
     {
-
-        try
-        {
-            throw new Exception("QtWallpaperServiceDelegate::onSurfaceCreated CALLSTACK");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceCreated ENTER");
+        
         m_surfaceHolder = holder;
         try 
-        {
-            m_surfaceIdSemaphore.acquire(); // 3: Have surface and id of the surface Qt is expecting
+        {   
+            //DLEE debug when we get blocked and if we get past
+            Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceCreated about to aquire m_surfaceIdSemaphore");         
+            m_surfaceIdSemaphore.acquire(); //Block until the ID is captured in createSurface 
+            Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceCreated got it! m_surfaceIdSemaphore");  
+            // 3: Have surface and id of the surface Qt is expecting
         } 
         catch (InterruptedException e) 
         {
@@ -351,34 +347,29 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         if(m_idSurface <= 0)
         {
             Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceCreated, m_idSurface: " + m_idSurface + " invalid, bailing out");
-            //return;
+            return;
         }
 
         Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceCreated, calling setSurface with m_idSurface: " + m_idSurface);
         QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), 800, 480);
         m_surfaceSemaphore.release(); // 4: Surface is set up and ready to go
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceCreated m_surfaceSemaphore released");
         QtNative.setApplicationState(ApplicationActive);
+
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceCreated EXIT");
     }
 
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
-        try
-        {
-            throw new Exception("QtWallpaperServiceDelegate::onSurfaceChanged CALLSTACK");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceChanged ENTER");
         if (width < 1 || height < 1)
             return;
 
         if(m_idSurface <= 0)
         {
             Log.e("Qt", "DLEE QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceChanged, m_idSurface: " + m_idSurface + " invalid, bailing out");
-            //return;
+            return;
         }
 
         m_surfaceHolder = holder;
@@ -386,6 +377,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         if (m_idSurface >= 0) {
             QtNative.setSurface(m_idSurface, m_surfaceHolder.getSurface(), width, height);
         }
+        Log.e("Qt", "DLEE QtWallpaperServiceDelegate::onSurfaceChanged EXIT");
     }   
 
     // Called from QtWallpaperService.QtWallpaperEngine
@@ -399,64 +391,37 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
     // Called from QtNative.java - run (from dispatched looper)
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface");
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate" + m_instanceIndex +"::createSurface ENTER");
+        
 
-
-        try
+        if(m_idSurface < 0)
         {
-            throw new Exception("QtWallpaperServiceDelegate::createSurface CALLSTACK");
+            m_idSurface = id;
         }
-        catch(Exception e)
+
+        
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface m_surfaceIdSemaphore released");
+        if(null == m_surfaceHolder)
         {
-            e.printStackTrace();
+            try
+            {
+                Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface about to aquire m_surfaceSemaphore");
+                m_surfaceSemaphore.acquire(); // 2a: Wait for the surface holder (with the actual surface) to get passed in onCreateSurface
+                Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface we got m_surfaceSemaphore");
+            }
+            catch(InterruptedException e)
+            {
+                Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface caught exception trying to aquire m_surfaceSemaphore");
+                e.printStackTrace();
+                return;
+            }
         }
-
-        if (m_surfaces.size() == 0) {
-            TypedValue attr = new TypedValue();
-            m_service.getTheme().resolveAttribute(android.R.attr.windowBackground, attr, true);
-            // if (attr.type >= TypedValue.TYPE_FIRST_COLOR_INT && attr.type <= TypedValue.TYPE_LAST_COLOR_INT) {
-            //     m_service.getWindow().setBackgroundDrawable(new ColorDrawable(attr.data));
-            // } else {
-            //     m_service.getWindow().setBackgroundDrawable(m_service.getResources().getDrawable(attr.resourceId));
-            // }
-            /*
-            if (m_dummyView != null) {
-                m_layout.removeView(m_dummyView);
-                m_dummyView = null;
-            }*/
+        else
+        {
+            Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface m_surfaceHolder NOT NULL, drain m_surfaceSemaphore");
+            m_surfaceSemaphore.drainPermits(); // 2b: we have the surface holder (somehow!?), set that semaphore back to 0
         }
-
-        /*
-        if (m_surfaces.containsKey(id))
-            m_layout.removeView(m_surfaces.remove(id));
-        */
-
-        Log.e("Qt", "DLee QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface id: " + id + " onTop: " + onTop + " imageDepth: " + imageDepth);
-        m_idSurface = id;
-        
-        /*
-        QtSurface surface = new QtSurface(m_service, id, onTop, imageDepth);
-        Log.e("Qt", "DLee QtWallpaperServiceDelegate DLEE new QtSurface");
-        
-        if (w < 0 || h < 0) {
-            surface.setLayoutParams( new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-        } else {
-            surface.setLayoutParams( new QtLayout.LayoutParams(w, h, x, y));
-        }
-
-        // Native views are always inserted in the end of the stack (i.e., on top).
-        // All other views are stacked based on the order they are created.
-        final int surfaceCount = getSurfaceCount();
-        //m_layout.addView(surface, surfaceCount);
-        
-        m_surfaces.put(id, surface);
-        if (!m_splashScreenSticky)
-            hideSplashScreen();
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface->QtNative.setSurface(id : " + id + ", surface, w: " + w + " , h: " + h + ");");
-        
-        QtNative.setSurface(id, surface, w, h);
-        */
+        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate::createSurface EXIT");
     } 
 
     public void insertNativeView(int id, View view, int x, int y, int w, int h) {
@@ -554,5 +519,14 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     public boolean hasSurface()
     {
         return m_idSurface != -1;
+    }
+
+    public void setSurfaceId(int id)
+    {
+        if(id > 0)
+        {
+            m_idSurface = id;
+            m_surfaceIdSemaphore.release(); // 1: We have the id of the surface Qt is expecting
+        }
     }
 }
