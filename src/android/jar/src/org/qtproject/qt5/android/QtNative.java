@@ -145,6 +145,7 @@ public class QtNative
         }
     }
 
+    //currently not called
     public static QtWallpaperServiceDelegate wallpaperServiceDelegate()
     {
         synchronized (m_mainActivityMutex) {
@@ -238,13 +239,16 @@ public class QtNative
 
     public static void setActivity(Activity qtMainActivity, QtActivityDelegate qtActivityDelegate)
     {
-        synchronized (m_mainActivityMutex) {
+        synchronized (m_mainActivityMutex) {                                                      
+
             m_activity = qtMainActivity;
             m_activityDelegate = qtActivityDelegate;
             m_isDrawable = true;
         }
     }
     
+
+    //Called by QtWallpaperServiceDelegate
     public static void setWallpaperService(WallpaperService qtMainWallpaper, QtWallpaperServiceDelegate qtWallpaperServiceDelegate)
     {
 
@@ -264,6 +268,7 @@ public class QtNative
 
     public static void setService(Service qtMainService, QtServiceDelegate qtServiceDelegate)
     {
+        Log.e(QtTAG, "DLEE WE IN HERE: setService");
         synchronized (m_mainActivityMutex) {
             m_service = qtMainService;
             m_serviceDelegate = qtServiceDelegate;
@@ -335,7 +340,7 @@ public class QtNative
             } 
 
             // Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("final boolean actionIsQueued = !%s && %s != null && %s != null && %s",m_activityPaused,m_isDrawable,mainLooper,handler_posted));
-            Log.e(QtTAG, "WATERMARK QtNative.Java -- " + String.format("%s", actionIsQueued));
+            Log.e(QtTAG, "WATERMARK QtNative.Java -- actionIsQueued? : " + String.format("%s", actionIsQueued));
             
             if (!actionIsQueued)
             {
@@ -833,6 +838,15 @@ public class QtNative
     private static void createSurface(final int id, final boolean onTop, final int x, final int y, final int w, final int h, final int imageDepth)
     {
         Log.e(QtTAG, "WATERMARK QtNative.Java -- createSurface");
+
+        try
+        {
+            throw new Exception("QtNative::createSurface CALLSTACK");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         
         runAction(new Runnable() {

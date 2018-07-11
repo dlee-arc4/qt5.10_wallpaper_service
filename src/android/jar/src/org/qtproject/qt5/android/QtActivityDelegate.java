@@ -566,6 +566,16 @@ public class QtActivityDelegate
             return false;
         }
 
+        //DLEE TODO Delete debug exception
+        try
+        {
+            throw new Exception("QtActivityDelegate - loadApplication");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }        
+
         m_activity = activity;
         setActionBarVisibility(false);
         QtNative.setActivity(m_activity, this);
@@ -1351,6 +1361,21 @@ public class QtActivityDelegate
     }
 
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
+        Log.e("Qt", "DLee QtActivityDelegate ::createSurface id: " + id + " onTop: " + onTop + " imageDepth: " + imageDepth);
+        
+
+        try
+        {
+            throw new Exception("QtActivityDelegate::createSurface CALLSTACK");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+         Log.e("Qt", "DLee QtActivityDelegate::createSurface m_surfaces.size(): " + m_surfaces.size());
+
+
         if (m_surfaces.size() == 0) {
             TypedValue attr = new TypedValue();
             m_activity.getTheme().resolveAttribute(android.R.attr.windowBackground, attr, true);

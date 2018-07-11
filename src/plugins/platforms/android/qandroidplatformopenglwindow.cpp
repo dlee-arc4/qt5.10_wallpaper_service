@@ -124,23 +124,30 @@ void QAndroidPlatformOpenGLWindow::setGeometry(const QRect &rect)
 
 EGLSurface QAndroidPlatformOpenGLWindow::eglSurface(EGLConfig config)
 {
+    qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
     if (QAndroidEventDispatcherStopper::stopped())
         return m_eglSurface;
 
     QMutexLocker lock(&m_surfaceMutex);
 
     if (m_nativeSurfaceId == -1) {
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         AndroidDeadlockProtector protector;
         if (!protector.acquire())
             return m_eglSurface;
 
         const bool windowStaysOnTop = bool(window()->flags() & Qt::WindowStaysOnTopHint);
-        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         m_nativeSurfaceId = QtAndroid::createSurface(this, geometry(), windowStaysOnTop, 32);
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d m_nativeSurfaceId:%d",__LINE__, m_nativeSurfaceId);
+
+
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d about to wait on m_surfaceWaitCondition",__LINE__);
         m_surfaceWaitCondition.wait(&m_surfaceMutex);
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d done with wait on m_surfaceWaitCondition",__LINE__);
     }
 
     if (m_eglSurface == EGL_NO_SURFACE) {
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::eglSurface:%d",__LINE__);
         m_surfaceMutex.unlock();
         checkNativeSurface(config);
         m_surfaceMutex.lock();
@@ -152,7 +159,10 @@ bool QAndroidPlatformOpenGLWindow::checkNativeSurface(EGLConfig config)
 {
     QMutexLocker lock(&m_surfaceMutex);
     if (m_nativeSurfaceId == -1 || !m_androidSurfaceObject.isValid())
+    {
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::checkNativeSurface:%d m_nativeSurfaceId: %d",__LINE__, m_nativeSurfaceId);
         return false; // makeCurrent is NOT needed.
+    }
 
     createEgl(config);
 
@@ -227,7 +237,10 @@ void QAndroidPlatformOpenGLWindow::surfaceChanged(JNIEnv *jniEnv, jobject surfac
     lockSurface();
     m_androidSurfaceObject = surface;
     if (surface) // wait until we have a valid surface to draw into
+    {
+        qInfo("WATERMARK QAndroidPlatformOpenGLWindow::surfaceChanged:%d about to m_surfaceWaitCondition.wakeOne() ",__LINE__);
         m_surfaceWaitCondition.wakeOne();
+    }
     unlockSurface();
 
     if (surface) {

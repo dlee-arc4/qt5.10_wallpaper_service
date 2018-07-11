@@ -203,6 +203,16 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
     public boolean loadApplication(Service service, ClassLoader classLoader, Bundle loaderParams)
     {
+        //DLEE TODO Delete debug exception
+        try
+        {
+            throw new Exception("QtWallpaperServiceDelegate - loadApplication");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.e("QT", "QtWallpaperDelegate#" + m_instanceIndex +"::loadApplication");
         /// check parameters integrity
         if (!loaderParams.containsKey(NATIVE_LIBRARIES_KEY)
@@ -317,10 +327,23 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceCreated(SurfaceHolder holder)
     {
+
+        try
+        {
+            throw new Exception("QtWallpaperServiceDelegate::onSurfaceCreated CALLSTACK");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
         m_surfaceHolder = holder;
-        try {
+        try 
+        {
             m_surfaceIdSemaphore.acquire(); // 3: Have surface and id of the surface Qt is expecting
-        } catch (InterruptedException e) {
+        } 
+        catch (InterruptedException e) 
+        {
             e.printStackTrace();
             return;
         }
@@ -340,7 +363,15 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
     // Called from QtWallpaperService.QtWallpaperEngine
     public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
-        Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::onSurfaceChanged");
+        try
+        {
+            throw new Exception("QtWallpaperServiceDelegate::onSurfaceChanged CALLSTACK");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if (width < 1 || height < 1)
             return;
 
@@ -366,6 +397,7 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
         }
     }   
 
+    // Called from QtNative.java - run (from dispatched looper)
     public void createSurface(int id, boolean onTop, int x, int y, int w, int h, int imageDepth) {
         Log.e("Qt", "WATERMARK QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface");
 
@@ -401,8 +433,10 @@ public class QtWallpaperServiceDelegate  extends QtServiceDelegate
 
         Log.e("Qt", "DLee QtWallpaperServiceDelegate#" + m_instanceIndex +"::createSurface id: " + id + " onTop: " + onTop + " imageDepth: " + imageDepth);
         m_idSurface = id;
+        
         /*
         QtSurface surface = new QtSurface(m_service, id, onTop, imageDepth);
+        Log.e("Qt", "DLee QtWallpaperServiceDelegate DLEE new QtSurface");
         
         if (w < 0 || h < 0) {
             surface.setLayoutParams( new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

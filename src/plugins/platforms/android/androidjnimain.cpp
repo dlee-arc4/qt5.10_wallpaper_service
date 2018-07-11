@@ -316,17 +316,22 @@ namespace QtAndroid
         return manufacturer + QLatin1Char(' ') + model;
     }
 
+    //called from: QAndroidPlatformOpenGLWindow::eglSurface
     int createSurface(AndroidSurfaceClient *client, const QRect &geometry, bool onTop, int imageDepth)
     {
         qInfo("WATERMARK QtAndroid::createSurface:%d",__LINE__);
         QJNIEnvironmentPrivate env;
         if (!env)
-            return -1;
+            return -1;   
 
         m_surfacesMutex.lock();
         int surfaceId = m_surfaceId++;
         m_surfaces[surfaceId] = client;
         m_surfacesMutex.unlock();
+
+        bool clientNull = (client == nullptr);
+
+        qInfo("WATERMARK QtAndroid::createSurface:%d surfaceId: %d clientNull: %d",__LINE__, surfaceId, clientNull);
 
         jint x = 0, y = 0, w = -1, h = -1;
         if (!geometry.isNull()) {
@@ -607,9 +612,13 @@ static void setSurface(JNIEnv *env, jobject /*thiz*/, jint id, jobject jSurface,
 {
     qInfo("WATERMARK QtAndroid::setSurface:%d",__LINE__);
     QMutexLocker lock(&m_surfacesMutex);
+    qInfo("WATERMARK DLEE QtAndroid::setSurface:%d called with id: %d w: %d h: %d",__LINE__, id, w, h);
     const auto &it = m_surfaces.find(id);
     if (it == m_surfaces.end())
+    {
+        qInfo("WATERMARK DLEE QtAndroid::setSurface:%d did not find id: %d, early return",__LINE__, id);
         return;
+    }
 
     auto surfaceClient = it.value();
     if (surfaceClient)

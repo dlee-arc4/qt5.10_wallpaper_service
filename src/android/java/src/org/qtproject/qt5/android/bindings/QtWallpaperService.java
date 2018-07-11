@@ -198,7 +198,7 @@ public class QtWallpaperService extends WallpaperService
         if (null == m_engine) {
             if(null != QtApplication.m_delegateObject)
             {
-                Log.e("QT", "DLee WallpaperService.Engine onCreateEngine constructing a QtApplication has a hot and fresh delegate for us, with classname: " + QtApplication.m_delegateObject.getClass());
+                Log.e("QT", "DLee WallpaperService.Engine onCreateEngine QtApplication has a hot and fresh delegate for us, with classname: " + QtApplication.m_delegateObject.getClass());
                 if(QtApplication.m_delegateObject instanceof QtWallpaperServiceDelegate)
                 {
                     Log.e("QT", "DLEE WallpaperService.Engine onCreateEngine WOOO the app delegate is an instanceof QtWallpaperServiceDelegate");
@@ -240,6 +240,7 @@ public class QtWallpaperService extends WallpaperService
         public QtWallpaperEngine(QtWallpaperServiceDelegate qtDelegate) {
             super();
 
+            //DLEE TODO Delete debug exception
             try
             {
                 throw new Exception("QtWallpaperEngine CTOR");
